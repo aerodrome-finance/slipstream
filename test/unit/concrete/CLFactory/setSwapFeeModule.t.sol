@@ -11,6 +11,7 @@ contract SetSwapFeeModule is CLFactoryTest {
     }
 
     function test_RevertIf_NotFeeManager() public {
+        vm.stopPrank();
         vm.expectRevert();
         vm.startPrank({msgSender: users.charlie});
         poolFactory.setSwapFeeModule({_swapFeeModule: users.charlie});

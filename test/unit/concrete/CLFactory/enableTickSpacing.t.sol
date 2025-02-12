@@ -10,6 +10,7 @@ contract EnableTickSpacingTest is CLFactoryTest {
     }
 
     function test_RevertIf_NotOwner() public {
+        vm.stopPrank();
         vm.expectRevert();
         vm.startPrank({msgSender: users.charlie});
         poolFactory.enableTickSpacing({tickSpacing: 250, fee: 5_000});

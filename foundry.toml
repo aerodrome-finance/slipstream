@@ -9,7 +9,9 @@ optimizer_runs = 200
 
 fs_permissions = [{ access = "read-write", path = "./"}]
 
-no_match_test = "testEchidna"
+no_match_test = "testEchidna|testGasFork"
+
+show_progress = true
 
 # See more config options https://github.com/foundry-rs/foundry/tree/master/config
 

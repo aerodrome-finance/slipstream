@@ -7,11 +7,12 @@ import "../BaseFixture.sol";
 abstract contract BaseForkFixture is BaseFixture {
     using stdJson for string;
 
+    uint256 public blockNumber = 12670000;
     string public addresses;
     IERC20 public dai;
 
     function setUp() public virtual override {
-        vm.createSelectFork({urlOrAlias: "base", blockNumber: 12670000});
+        vm.createSelectFork({urlOrAlias: "base", blockNumber: blockNumber});
 
         string memory root = vm.projectRoot();
         string memory path = string(abi.encodePacked(root, "/test/fork/addresses.json"));
