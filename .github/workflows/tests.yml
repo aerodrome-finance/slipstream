@@ -9,13 +9,13 @@ on:
 jobs:
   unit-tests:
     name: Unit Tests
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
 
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 14
+          node-version: 20
 
       - id: yarn-cache
         run: echo "::set-output name=dir::$(yarn cache dir)"
@@ -49,7 +49,7 @@ jobs:
           BASE_RPC_URL: ${{ secrets.BASE_RPC_URL }}
   test:
     name: Foundry Unit Tests
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:

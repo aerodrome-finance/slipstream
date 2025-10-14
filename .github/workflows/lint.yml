@@ -8,7 +8,7 @@ on:
 
 jobs:
     run-linters:
-      runs-on: ubuntu-latest
+      runs-on: blacksmith-4vcpu-ubuntu-2404
 
       steps:
         - name: Check out github repository
@@ -45,7 +45,7 @@ jobs:
         #   run: yarn lint
 
     run-fmt:
-      runs-on: ubuntu-latest
+      runs-on: blacksmith-4vcpu-ubuntu-2404
       
       steps:
         - uses: actions/checkout@v4
