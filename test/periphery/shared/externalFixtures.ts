@@ -10,6 +10,7 @@ import {
   MockTimeNonfungiblePositionManager,
 } from '../../../typechain'
 import { MockVoter } from '../../../typechain/MockVoter'
+import { MockMinter } from '../../../typechain/MockMinter'
 import { CustomUnstakedFeeModule, MockVotingRewardsFactory } from '../../../typechain'
 import { CLGaugeFactory } from '../../../typechain/CLGaugeFactory'
 import { CLGauge } from '../../../typechain/CLGauge'
@@ -52,6 +53,7 @@ const v3CoreFactoryFixture: Fixture<{
   const pool = (await Pool.deploy()) as ICLPool
 
   const MockVoterFactory = await ethers.getContractFactory('MockVoter')
+  const MockMinterFactory = await ethers.getContractFactory('MockMinter')
   const GaugeImplementationFactory = await ethers.getContractFactory('CLGauge')
   const GaugeFactoryFactory = await ethers.getContractFactory('CLGaugeFactory')
   const MockFactoryRegistryFactory = await ethers.getContractFactory('MockFactoryRegistry')
@@ -63,10 +65,12 @@ const v3CoreFactoryFixture: Fixture<{
   // voter & gauge factory set up
   const mockVotingEscrow = await MockVotingEscrowFactory.deploy(wallet.address)
   const mockFactoryRegistry = await MockFactoryRegistryFactory.deploy()
+  const mockMinter = (await MockMinterFactory.deploy(rewardToken.address)) as MockMinter
   const mockVoter = (await MockVoterFactory.deploy(
     rewardToken.address,
     mockFactoryRegistry.address,
-    mockVotingEscrow.address
+    mockVotingEscrow.address,
+    mockMinter.address
   )) as MockVoter
 
   const factory = (await Factory.deploy(mockVoter.address, pool.address)) as ICLFactory
@@ -78,7 +82,9 @@ const v3CoreFactoryFixture: Fixture<{
   const gaugeImplementation = (await GaugeImplementationFactory.deploy()) as CLGauge
   const gaugeFactory = (await GaugeFactoryFactory.deploy(
     mockVoter.address,
-    gaugeImplementation.address
+    gaugeImplementation.address,
+    wallet.address,
+    100 // default cap
   )) as CLGaugeFactory
 
   const nftDescriptorLibraryFactory = await ethers.getContractFactory('NFTDescriptor')

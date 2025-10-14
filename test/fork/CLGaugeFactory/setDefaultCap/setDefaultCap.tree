@@ -1,0 +1,12 @@
+SetDefaultCapIntegrationConcreteTest
+├── When caller is not the emission admin
+│   └── It should revert with {NotAuthorized}
+└── When caller is the emission admin
+    ├── When default cap is zero
+    │   └── It should revert with {ZeroDefaultCap}
+    └── When default cap is not zero
+        ├── When default cap is greater than max bps
+        │   └── It should revert with {MaxCap}
+        └── When default cap is less or equal to max bps
+            ├── It should set the new default cap for gauges
+            └── It should emit a {SetDefaultCap} event

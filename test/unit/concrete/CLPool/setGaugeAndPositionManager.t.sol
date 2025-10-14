@@ -13,11 +13,13 @@ contract SetGaugeAndPositionManagerTest is CLPoolTest {
 
         // redeploy contracts
         factoryRegistry = IFactoryRegistry(new MockFactoryRegistry());
+        minter = IMinter(new MockMinter({_aero: address(rewardToken)}));
         voter = IVoter(
             new MockVoter({
                 _rewardToken: address(rewardToken),
                 _factoryRegistry: address(factoryRegistry),
-                _ve: address(escrow)
+                _ve: address(escrow),
+                _minter: address(minter)
             })
         );
 
@@ -25,7 +27,12 @@ contract SetGaugeAndPositionManagerTest is CLPoolTest {
         poolFactory = new CLFactory({_voter: address(voter), _poolImplementation: address(poolImplementation)});
 
         gaugeImplementation = new CLGauge();
-        gaugeFactory = new CLGaugeFactory({_voter: address(voter), _implementation: address(gaugeImplementation)});
+        gaugeFactory = new CLGaugeFactory({
+            _voter: address(voter),
+            _implementation: address(gaugeImplementation),
+            _emissionAdmin: users.owner,
+            _defaultCap: 100
+        });
 
         nftDescriptor = new NonfungibleTokenPositionDescriptor({
             _WETH9: address(weth),

@@ -41,7 +41,9 @@ async function main() {
     'CLGaugeFactory',
     undefined,
     jsonConstants.Voter,
-    gaugeImplementation.address
+    gaugeImplementation.address,
+    jsonConstants.emissionAdmin,
+    100 // default cap
   )
 
   const nftDescriptorLibrary = await deployLibrary('NFTDescriptor')

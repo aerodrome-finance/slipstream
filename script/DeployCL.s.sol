@@ -33,6 +33,7 @@ contract DeployCL is Script {
     address public poolFactoryOwner;
     address public feeManager;
     address public notifyAdmin;
+    address public emissionAdmin;
     address public factoryV2;
     string public nftName;
     string public nftSymbol;
@@ -63,6 +64,7 @@ contract DeployCL is Script {
         poolFactoryOwner = abi.decode(vm.parseJson(jsonConstants, ".poolFactoryOwner"), (address));
         feeManager = abi.decode(vm.parseJson(jsonConstants, ".feeManager"), (address));
         notifyAdmin = abi.decode(vm.parseJson(jsonConstants, ".notifyAdmin"), (address));
+        emissionAdmin = abi.decode(vm.parseJson(jsonConstants, ".emissionAdmin"), (address));
         factoryV2 = abi.decode(vm.parseJson(jsonConstants, ".factoryV2"), (address));
         nftName = abi.decode(vm.parseJson(jsonConstants, ".nftName"), (string));
         nftSymbol = abi.decode(vm.parseJson(jsonConstants, ".nftSymbol"), (string));
@@ -76,7 +78,12 @@ contract DeployCL is Script {
 
         // deploy gauges
         gaugeImplementation = new CLGauge();
-        gaugeFactory = new CLGaugeFactory({_voter: voter, _implementation: address(gaugeImplementation)});
+        gaugeFactory = new CLGaugeFactory({
+            _voter: address(voter),
+            _implementation: address(gaugeImplementation),
+            _emissionAdmin: emissionAdmin,
+            _defaultCap: 100
+        });
 
         // deploy nft contracts
         nftDescriptor =

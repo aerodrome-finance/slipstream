@@ -15,6 +15,7 @@ import {IVotingRewardsFactory} from "contracts/test/interfaces/IVotingRewardsFac
 contract MockVoter is IVoter {
     // mock addresses used for testing gauge creation, a copy is stored in Constants.sol
     address public forwarder = address(11);
+    address public override governor;
 
     // Rewards are released over 7 days
     uint256 internal constant DURATION = 7 days;
@@ -27,15 +28,17 @@ contract MockVoter is IVoter {
     mapping(address => address) public override gaugeToBribes;
 
     IERC20 internal immutable rewardToken;
+    address public override minter;
     IFactoryRegistry public immutable override factoryRegistry;
     IVotingEscrow public immutable override ve;
     address public immutable override emergencyCouncil;
 
-    constructor(address _rewardToken, address _factoryRegistry, address _ve) {
+    constructor(address _rewardToken, address _factoryRegistry, address _ve, address _minter) {
         rewardToken = IERC20(_rewardToken);
         factoryRegistry = IFactoryRegistry(_factoryRegistry);
         ve = IVotingEscrow(_ve);
         emergencyCouncil = msg.sender;
+        minter = _minter;
     }
 
     function claimFees(address[] memory, address[][] memory, uint256) external override {}

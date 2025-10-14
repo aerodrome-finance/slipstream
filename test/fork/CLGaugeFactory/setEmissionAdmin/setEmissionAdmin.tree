@@ -1,0 +1,9 @@
+SetEmissionAdminIntegrationConcreteTest
+├── When caller is not the emission admin
+│   └── It should revert with {NotAuthorized}
+└── When caller is the emission admin
+    ├── When admin is the zero address
+    │   └── It should revert with {ZeroAddress}
+    └── When admin is not the zero address
+        ├── It should set the new emission admin
+        └── It should emit a {SetEmissionAdmin} event

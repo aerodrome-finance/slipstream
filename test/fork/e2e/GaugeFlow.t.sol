@@ -44,6 +44,10 @@ contract GaugeFlowTest is BaseForkFixture {
         deal(address(rewardToken), address(voter), EMISSION * 100);
         vm.prank(address(voter));
         rewardToken.approve(address(gauge), EMISSION * 100);
+
+        // set max cap on gauge
+        vm.prank(users.owner);
+        gaugeFactory.setEmissionCap({_gauge: address(gauge), _emissionCap: 10_000});
     }
 
     //swaps a certain amount of token0 for token1 - only intended for testing purposes

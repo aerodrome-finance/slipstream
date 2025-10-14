@@ -6,6 +6,7 @@ import { CLFactory } from '../../../typechain/CLFactory'
 import { TestCLCallee } from '../../../typechain/TestCLCallee'
 import { TestCLRouter } from '../../../typechain/TestCLRouter'
 import { MockVoter } from '../../../typechain/MockVoter'
+import { MockMinter } from '../../../typechain/MockMinter'
 import { CustomUnstakedFeeModule, MockFactoryRegistry, MockVotingRewardsFactory } from '../../../typechain'
 import { CLGaugeFactory } from '../../../typechain/CLGaugeFactory'
 import { CLGauge } from '../../../typechain/CLGauge'
@@ -60,6 +61,7 @@ export const poolFixture: Fixture<PoolFixture> = async function (): Promise<Pool
   const MockTimeCLPoolDeployerFactory = await ethers.getContractFactory('CLFactory')
   const MockTimeCLPoolFactory = await ethers.getContractFactory('MockTimeCLPool')
   const MockVoterFactory = await ethers.getContractFactory('MockVoter')
+  const MockMinterFactory = await ethers.getContractFactory('MockMinter')
   const GaugeImplementationFactory = await ethers.getContractFactory('CLGauge')
   const GaugeFactoryFactory = await ethers.getContractFactory('CLGaugeFactory')
   const MockFactoryRegistryFactory = await ethers.getContractFactory('MockFactoryRegistry')
@@ -70,15 +72,19 @@ export const poolFixture: Fixture<PoolFixture> = async function (): Promise<Pool
   // voter & gauge factory set up
   const mockVotingEscrow = await MockVotingEscrowFactory.deploy(wallet.address)
   const mockFactoryRegistry = await MockFactoryRegistryFactory.deploy()
+  const mockMinter = (await MockMinterFactory.deploy(token2.address)) as MockMinter
   const mockVoter = (await MockVoterFactory.deploy(
     token2.address,
     mockFactoryRegistry.address,
-    mockVotingEscrow.address
+    mockVotingEscrow.address,
+    mockMinter.address
   )) as MockVoter
   const gaugeImplementation = (await GaugeImplementationFactory.deploy()) as CLGauge
   const gaugeFactory = (await GaugeFactoryFactory.deploy(
     mockVoter.address,
-    gaugeImplementation.address
+    gaugeImplementation.address,
+    wallet.address,
+    100 // default cap
   )) as CLGaugeFactory
   // nft position manager stub, unused in hardhat tests
   await gaugeFactory.setNonfungiblePositionManager('0x0000000000000000000000000000000000000001')

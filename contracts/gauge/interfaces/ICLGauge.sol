@@ -19,6 +19,9 @@ interface ICLGauge {
     /// @notice Voter contract gauge receives emissions from
     function voter() external view returns (IVoter);
 
+    /// @notice Minter contract used to mint emissions
+    function minter() external view returns (address);
+
     /// @notice Address of the CL pool linked to the gauge
     function pool() external view returns (ICLPool);
 

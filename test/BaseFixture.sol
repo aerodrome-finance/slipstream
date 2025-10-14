@@ -15,6 +15,7 @@ import {CLGaugeFactory} from "contracts/gauge/CLGaugeFactory.sol";
 import {CLGauge} from "contracts/gauge/CLGauge.sol";
 import {MockWETH} from "contracts/test/MockWETH.sol";
 import {IVoter, MockVoter} from "contracts/test/MockVoter.sol";
+import {MockMinter} from "contracts/test/MockMinter.sol";
 import {IVotingEscrow, MockVotingEscrow} from "contracts/test/MockVotingEscrow.sol";
 import {IFactoryRegistry, MockFactoryRegistry} from "contracts/test/MockFactoryRegistry.sol";
 import {IVotingRewardsFactory, MockVotingRewardsFactory} from "contracts/test/MockVotingRewardsFactory.sol";
@@ -25,6 +26,7 @@ import {Events} from "./utils/Events.sol";
 import {PoolUtils} from "./utils/PoolUtils.sol";
 import {Users} from "./utils/Users.sol";
 import {SafeCast} from "contracts/gauge/libraries/SafeCast.sol";
+import {ProtocolTimeLibrary} from "contracts/libraries/ProtocolTimeLibrary.sol";
 import {TestCLCallee} from "contracts/core/test/TestCLCallee.sol";
 import {NFTManagerCallee} from "contracts/periphery/test/NFTManagerCallee.sol";
 import {CustomUnstakedFeeModule} from "contracts/core/fees/CustomUnstakedFeeModule.sol";
@@ -78,65 +80,8 @@ abstract contract BaseFixture is Test, Constants, Events, PoolUtils {
         rewardToken = new ERC20("", "");
 
         deployDependencies();
-
-        // deploy pool and associated contracts
-        poolImplementation = new CLPool();
-        poolFactory = new CLFactory({_voter: address(voter), _poolImplementation: address(poolImplementation)});
-        // backward compatibility with the original uniV3 fee structure and tick spacing
-        poolFactory.enableTickSpacing(10, 500);
-        poolFactory.enableTickSpacing(60, 3_000);
-        // 200 tick spacing fee is manually overriden in tests as it is part of default settings
-
-        // deploy gauges and associated contracts
-        gaugeImplementation = new CLGauge();
-        gaugeFactory = new CLGaugeFactory({_voter: address(voter), _implementation: address(gaugeImplementation)});
-
-        // deploy nft manager and descriptor
-        nftDescriptor = new NonfungibleTokenPositionDescriptor({
-            _WETH9: address(weth),
-            _nativeCurrencyLabelBytes: 0x4554480000000000000000000000000000000000000000000000000000000000 // 'ETH' as bytes32 string
-        });
-        nft = new NonfungiblePositionManager({
-            _factory: address(poolFactory),
-            _WETH9: address(weth),
-            _tokenDescriptor: address(nftDescriptor),
-            name: nftName,
-            symbol: nftSymbol
-        });
-
-        // set nftmanager in the factories
-        gaugeFactory.setNonfungiblePositionManager(address(nft));
-        gaugeFactory.setNotifyAdmin(users.owner);
-        vm.stopPrank();
-
-        // approve gauge in factory registry
-        vm.prank(Ownable(address(factoryRegistry)).owner());
-        factoryRegistry.approve({
-            poolFactory: address(poolFactory),
-            votingRewardsFactory: address(votingRewardsFactory),
-            gaugeFactory: address(gaugeFactory)
-        });
-
-        // transfer residual permissions
-        vm.startPrank(users.owner);
-        poolFactory.setOwner(users.owner);
-        poolFactory.setSwapFeeManager(users.feeManager);
-        poolFactory.setUnstakedFeeManager(users.feeManager);
-        vm.stopPrank();
-
-        customSwapFeeModule = new CustomSwapFeeModule(address(poolFactory));
-        customUnstakedFeeModule = new CustomUnstakedFeeModule(address(poolFactory));
-        vm.startPrank(users.feeManager);
-        poolFactory.setSwapFeeModule(address(customSwapFeeModule));
-        poolFactory.setUnstakedFeeModule(address(customUnstakedFeeModule));
-        vm.stopPrank();
-
-        ERC20 tokenA = new ERC20("", "");
-        ERC20 tokenB = new ERC20("", "");
-        (token0, token1) = tokenA < tokenB ? (tokenA, tokenB) : (tokenB, tokenA);
-
-        clCallee = new TestCLCallee();
-        nftCallee = new NFTManagerCallee(address(token0), address(token1), address(nft));
+        deployContracts();
+        postDeployment();
 
         deal({token: address(token0), to: users.alice, give: TOKEN_1 * 1000});
         deal({token: address(token1), to: users.alice, give: TOKEN_1 * 1000});
@@ -158,6 +103,82 @@ abstract contract BaseFixture is Test, Constants, Events, PoolUtils {
         labelContracts();
     }
 
+    function postDeployment() public virtual {
+        // backward compatibility with the original uniV3 fee structure and tick spacing
+        poolFactory.enableTickSpacing(10, 500);
+        poolFactory.enableTickSpacing(60, 3_000);
+        // 200 tick spacing fee is manually overriden in tests as it is part of default settings
+
+        // set nftmanager in the factories
+        gaugeFactory.setNonfungiblePositionManager(address(nft));
+        gaugeFactory.setNotifyAdmin(users.owner);
+        vm.stopPrank();
+
+        // approve gauge in factory registry
+        vm.prank(Ownable(address(factoryRegistry)).owner());
+        factoryRegistry.approve({
+            poolFactory: address(poolFactory),
+            votingRewardsFactory: address(votingRewardsFactory),
+            gaugeFactory: address(gaugeFactory)
+        });
+
+        // transfer residual permissions
+        vm.startPrank(users.owner);
+        poolFactory.setOwner(users.owner);
+        poolFactory.setSwapFeeManager(users.feeManager);
+        poolFactory.setUnstakedFeeManager(users.feeManager);
+        vm.stopPrank();
+
+        vm.startPrank(users.feeManager);
+        poolFactory.setSwapFeeModule(address(customSwapFeeModule));
+        poolFactory.setUnstakedFeeModule(address(customUnstakedFeeModule));
+        vm.stopPrank();
+
+        // mock max emission cap in gauge factory
+        vm.mockCall(
+            address(gaugeFactory),
+            abi.encodeWithSelector(CLGaugeFactory.calculateMaxEmissions.selector),
+            abi.encode(type(uint256).max)
+        );
+    }
+
+    function deployContracts() public virtual {
+        // deploy pool and associated contracts
+        poolImplementation = new CLPool();
+        poolFactory = new CLFactory({_voter: address(voter), _poolImplementation: address(poolImplementation)});
+
+        // deploy gauges and associated contracts
+        gaugeImplementation = new CLGauge();
+        gaugeFactory = new CLGaugeFactory({
+            _voter: address(voter),
+            _implementation: address(gaugeImplementation),
+            _emissionAdmin: users.owner,
+            _defaultCap: 100
+        });
+
+        // deploy nft manager and descriptor
+        nftDescriptor = new NonfungibleTokenPositionDescriptor({
+            _WETH9: address(weth),
+            _nativeCurrencyLabelBytes: 0x4554480000000000000000000000000000000000000000000000000000000000 // 'ETH' as bytes32 string
+        });
+        nft = new NonfungiblePositionManager({
+            _factory: address(poolFactory),
+            _WETH9: address(weth),
+            _tokenDescriptor: address(nftDescriptor),
+            name: nftName,
+            symbol: nftSymbol
+        });
+
+        customSwapFeeModule = new CustomSwapFeeModule(address(poolFactory));
+        customUnstakedFeeModule = new CustomUnstakedFeeModule(address(poolFactory));
+        ERC20 tokenA = new ERC20("", "");
+        ERC20 tokenB = new ERC20("", "");
+        (token0, token1) = tokenA < tokenB ? (tokenA, tokenB) : (tokenB, tokenA);
+
+        clCallee = new TestCLCallee();
+        nftCallee = new NFTManagerCallee(address(token0), address(token1), address(nft));
+    }
+
     /// @dev Deploys mocks of external dependencies
     ///      Override if using a fork test
     function deployDependencies() public virtual {
@@ -165,11 +186,13 @@ abstract contract BaseFixture is Test, Constants, Events, PoolUtils {
         votingRewardsFactory = IVotingRewardsFactory(new MockVotingRewardsFactory());
         weth = IERC20(address(new MockWETH()));
         escrow = IVotingEscrow(new MockVotingEscrow(users.owner));
+        minter = IMinter(new MockMinter({_aero: address(rewardToken)}));
         voter = IVoter(
             new MockVoter({
                 _rewardToken: address(rewardToken),
                 _factoryRegistry: address(factoryRegistry),
-                _ve: address(escrow)
+                _ve: address(escrow),
+                _minter: address(minter)
             })
         );
     }

@@ -27,6 +27,8 @@ contract CLGauge is ICLGauge, ERC721Holder, ReentrancyGuard {
     /// @inheritdoc ICLGauge
     IVoter public override voter;
     /// @inheritdoc ICLGauge
+    address public override minter;
+    /// @inheritdoc ICLGauge
     ICLPool public override pool;
     /// @inheritdoc ICLGauge
     ICLGaugeFactory public override gaugeFactory;
@@ -96,6 +98,7 @@ contract CLGauge is ICLGauge, ERC721Holder, ReentrancyGuard {
         tickSpacing = _tickSpacing;
         isPool = _isPool;
         supportsPayable = _token0 == _weth || _token1 == _weth;
+        minter = IVoter(_voter).minter();
     }
 
     receive() external payable {
@@ -274,7 +277,15 @@ contract CLGauge is ICLGauge, ERC721Holder, ReentrancyGuard {
         address sender = msg.sender;
         require(sender == address(voter), "NV");
         require(_amount != 0, "ZR");
+
         _claimFees();
+
+        uint256 maxAmount = gaugeFactory.calculateMaxEmissions({_gauge: address(this)});
+        /// @dev If emission cap is exceeded, transfer excess emissions back to Minter
+        if (_amount > maxAmount) {
+            TransferHelper.safeTransferFrom(rewardToken, sender, minter, _amount - maxAmount);
+            _amount = maxAmount;
+        }
         _notifyRewardAmount(sender, _amount);
     }
 

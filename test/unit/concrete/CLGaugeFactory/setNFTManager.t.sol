@@ -8,7 +8,12 @@ contract SetNFTManagerTest is CLGaugeFactoryTest {
         super.setUp();
 
         vm.startPrank({msgSender: users.owner});
-        gaugeFactory = new CLGaugeFactory({_voter: address(voter), _implementation: address(gaugeImplementation)});
+        gaugeFactory = new CLGaugeFactory({
+            _voter: address(voter),
+            _implementation: address(gaugeImplementation),
+            _emissionAdmin: users.owner,
+            _defaultCap: 100
+        });
 
         nft = new NonfungiblePositionManager({
             _factory: address(poolFactory),

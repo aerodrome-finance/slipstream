@@ -42,4 +42,37 @@ abstract contract BaseForkFixture is BaseFixture {
         escrow = IVotingEscrow(vm.parseJsonAddress(addresses, ".VotingEscrow"));
         minter = IMinter(vm.parseJsonAddress(addresses, ".Minter"));
     }
+
+    function postDeployment() public virtual override {
+        // backward compatibility with the original uniV3 fee structure and tick spacing
+        poolFactory.enableTickSpacing(10, 500);
+        poolFactory.enableTickSpacing(60, 3_000);
+        // 200 tick spacing fee is manually overriden in tests as it is part of default settings
+
+        // set nftmanager in the factories
+        gaugeFactory.setNonfungiblePositionManager(address(nft));
+        gaugeFactory.setNotifyAdmin(users.owner);
+        vm.stopPrank();
+
+        // approve gauge factory in factory registry
+        vm.prank(Ownable(address(factoryRegistry)).owner());
+        factoryRegistry.approve({
+            poolFactory: address(poolFactory),
+            votingRewardsFactory: address(votingRewardsFactory),
+            gaugeFactory: address(gaugeFactory)
+        });
+
+        // transfer residual permissions
+        vm.startPrank(users.owner);
+        poolFactory.setOwner(users.owner);
+        poolFactory.setSwapFeeManager(users.feeManager);
+        poolFactory.setUnstakedFeeManager(users.feeManager);
+
+        vm.stopPrank();
+
+        vm.startPrank(users.feeManager);
+        poolFactory.setSwapFeeModule(address(customSwapFeeModule));
+        poolFactory.setUnstakedFeeModule(address(customUnstakedFeeModule));
+        vm.stopPrank();
+    }
 }

@@ -9,6 +9,7 @@ import {ERC721Holder} from "@openzeppelin/contracts/token/ERC721/ERC721Holder.so
 import {CLPool} from "contracts/core/CLPool.sol";
 import {CLFactory} from "contracts/core/CLFactory.sol";
 import {IVoter, MockVoter} from "contracts/test/MockVoter.sol";
+import {IMinter, MockMinter} from "contracts/test/MockMinter.sol";
 import {IVotingEscrow, MockVotingEscrow} from "contracts/test/MockVotingEscrow.sol";
 import {IFactoryRegistry, MockFactoryRegistry} from "contracts/test/MockFactoryRegistry.sol";
 import {
@@ -74,6 +75,7 @@ contract SetupCL {
     CoreTestERC20 token1;
     IFactoryRegistry public factoryRegistry;
     IVoter public voter;
+    IMinter public minter;
     IVotingEscrow public escrow;
     CoreTestERC20 public rewardToken;
     IERC20 public weth;
@@ -101,11 +103,13 @@ contract SetupCL {
         votingRewardsFactory = IVotingRewardsFactory(new MockVotingRewardsFactory());
         weth = IERC20(address(new MockWETH()));
 
+        minter = IMinter(new MockMinter({_aero: address(rewardToken)}));
         voter = IVoter(
             new MockVoter({
                 _rewardToken: address(rewardToken),
                 _factoryRegistry: address(factoryRegistry),
-                _ve: address(escrow)
+                _ve: address(escrow),
+                _minter: address(minter)
             })
         );
 
@@ -121,7 +125,12 @@ contract SetupCL {
 
         // deploy gauges and associated contracts
         gaugeImplementation = new CLGauge();
-        gaugeFactory = new CLGaugeFactory({_voter: address(voter), _implementation: address(gaugeImplementation)});
+        gaugeFactory = new CLGaugeFactory({
+            _voter: address(voter),
+            _implementation: address(gaugeImplementation),
+            _emissionAdmin: address(this),
+            _defaultCap: 100
+        });
 
         // deploy nft manager
         nft = new NonfungiblePositionManager({

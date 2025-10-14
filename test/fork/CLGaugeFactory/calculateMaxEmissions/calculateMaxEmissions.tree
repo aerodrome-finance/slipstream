@@ -1,0 +1,8 @@
+CalculateMaxEmissionsIntegrationConcreteTest
+├── When active period is not equal to active period in minter
+│   ├── It should calculate tail emissions
+│   ├── It should cache the current minter active period
+│   ├── It should cache the weekly emissions for this epoch
+│   └── It should return max amount based on weekly emissions and gauge emission cap
+└── When active period is equal to active period in minter
+    └── It should return max amount based on cached weekly emissions and gauge emission cap
