@@ -14,6 +14,7 @@ import {
 import {CLGaugeFactory} from "contracts/gauge/CLGaugeFactory.sol";
 import {CLGauge} from "contracts/gauge/CLGauge.sol";
 import {MockWETH} from "contracts/test/MockWETH.sol";
+import {MockCLFactory} from "contracts/test/MockCLFactory.sol";
 import {IVoter, MockVoter} from "contracts/test/MockVoter.sol";
 import {MockMinter} from "contracts/test/MockMinter.sol";
 import {IVotingEscrow, MockVotingEscrow} from "contracts/test/MockVotingEscrow.sol";
@@ -36,6 +37,7 @@ import {IMinter} from "contracts/core/interfaces/IMinter.sol";
 
 abstract contract BaseFixture is Test, Constants, Events, PoolUtils {
     CLFactory public poolFactory;
+    CLFactory public legacyPoolFactory;
     CLPool public poolImplementation;
     NonfungibleTokenPositionDescriptor public nftDescriptor;
     NonfungiblePositionManager public nft;
@@ -145,7 +147,19 @@ abstract contract BaseFixture is Test, Constants, Events, PoolUtils {
     function deployContracts() public virtual {
         // deploy pool and associated contracts
         poolImplementation = new CLPool();
-        poolFactory = new CLFactory({_voter: address(voter), _poolImplementation: address(poolImplementation)});
+
+        // create mock cl factory
+        address mockFactory = address(new MockCLFactory());
+        legacyPoolFactory = new CLFactory({
+            _voter: address(voter),
+            _clFactory: mockFactory,
+            _poolImplementation: address(poolImplementation)
+        });
+        poolFactory = new CLFactory({
+            _voter: address(voter),
+            _clFactory: address(legacyPoolFactory),
+            _poolImplementation: address(poolImplementation)
+        });
 
         // deploy gauges and associated contracts
         gaugeImplementation = new CLGauge();

@@ -2,6 +2,7 @@
 pragma solidity >=0.5.0;
 
 import {IVoter} from "contracts/core/interfaces/IVoter.sol";
+import {ICLFactory} from "contracts/core/interfaces/ICLFactory.sol";
 import {IFactoryRegistry} from "contracts/core/interfaces/IFactoryRegistry.sol";
 
 /// @title The interface for the CL Factory
@@ -60,6 +61,11 @@ interface ICLFactory {
     /// @notice Factory registry for valid pool / gauge / rewards factories
     /// @return The address of the factory registry
     function factoryRegistry() external view returns (IFactoryRegistry);
+
+    /// @notice The address of the legacy CLFactory
+    /// @dev The legacy CLFactory that operates concurrently with this pool factory
+    /// @return The address of the legacy pool factory
+    function legacyCLFactory() external view returns (ICLFactory);
 
     /// @notice Returns the current owner of the factory
     /// @dev Can be changed by the current owner via setOwner

@@ -60,6 +60,7 @@ export const poolFixture: Fixture<PoolFixture> = async function (): Promise<Pool
 
   const MockTimeCLPoolDeployerFactory = await ethers.getContractFactory('CLFactory')
   const MockTimeCLPoolFactory = await ethers.getContractFactory('MockTimeCLPool')
+  const MockLegacyCLFactory = await ethers.getContractFactory('MockCLFactory')
   const MockVoterFactory = await ethers.getContractFactory('MockVoter')
   const MockMinterFactory = await ethers.getContractFactory('MockMinter')
   const GaugeImplementationFactory = await ethers.getContractFactory('CLGauge')
@@ -72,6 +73,7 @@ export const poolFixture: Fixture<PoolFixture> = async function (): Promise<Pool
   // voter & gauge factory set up
   const mockVotingEscrow = await MockVotingEscrowFactory.deploy(wallet.address)
   const mockFactoryRegistry = await MockFactoryRegistryFactory.deploy()
+  const mockLegacyCLFactory = await MockLegacyCLFactory.deploy()
   const mockMinter = (await MockMinterFactory.deploy(token2.address)) as MockMinter
   const mockVoter = (await MockVoterFactory.deploy(
     token2.address,
@@ -92,6 +94,7 @@ export const poolFixture: Fixture<PoolFixture> = async function (): Promise<Pool
   const mockTimePool = (await MockTimeCLPoolFactory.deploy()) as MockTimeCLPool
   const mockTimePoolDeployer = (await MockTimeCLPoolDeployerFactory.deploy(
     mockVoter.address,
+    mockLegacyCLFactory.address,
     mockTimePool.address
   )) as CLFactory
   const customUnstakedFeeModule = (await CustomUnstakedFeeModuleFactory.deploy(

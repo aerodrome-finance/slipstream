@@ -54,6 +54,7 @@ const v3CoreFactoryFixture: Fixture<{
 
   const MockVoterFactory = await ethers.getContractFactory('MockVoter')
   const MockMinterFactory = await ethers.getContractFactory('MockMinter')
+  const MockLegacyCLFactory = await ethers.getContractFactory('MockCLFactory')
   const GaugeImplementationFactory = await ethers.getContractFactory('CLGauge')
   const GaugeFactoryFactory = await ethers.getContractFactory('CLGaugeFactory')
   const MockFactoryRegistryFactory = await ethers.getContractFactory('MockFactoryRegistry')
@@ -65,6 +66,7 @@ const v3CoreFactoryFixture: Fixture<{
   // voter & gauge factory set up
   const mockVotingEscrow = await MockVotingEscrowFactory.deploy(wallet.address)
   const mockFactoryRegistry = await MockFactoryRegistryFactory.deploy()
+  const mockLegacyCLFactory = await MockLegacyCLFactory.deploy()
   const mockMinter = (await MockMinterFactory.deploy(rewardToken.address)) as MockMinter
   const mockVoter = (await MockVoterFactory.deploy(
     rewardToken.address,
@@ -73,7 +75,7 @@ const v3CoreFactoryFixture: Fixture<{
     mockMinter.address
   )) as MockVoter
 
-  const factory = (await Factory.deploy(mockVoter.address, pool.address)) as ICLFactory
+  const factory = (await Factory.deploy(mockVoter.address, mockLegacyCLFactory.address, pool.address)) as ICLFactory
   const customUnstakedFeeModule = (await CustomUnstakedFeeModuleFactory.deploy(
     factory.address
   )) as CustomUnstakedFeeModule

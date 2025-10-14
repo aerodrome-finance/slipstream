@@ -8,6 +8,7 @@ import {IERC20, ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {ERC721Holder} from "@openzeppelin/contracts/token/ERC721/ERC721Holder.sol";
 import {CLPool} from "contracts/core/CLPool.sol";
 import {CLFactory} from "contracts/core/CLFactory.sol";
+import {MockCLFactory} from "contracts/test/MockCLFactory.sol";
 import {IVoter, MockVoter} from "contracts/test/MockVoter.sol";
 import {IMinter, MockMinter} from "contracts/test/MockMinter.sol";
 import {IVotingEscrow, MockVotingEscrow} from "contracts/test/MockVotingEscrow.sol";
@@ -117,7 +118,12 @@ contract SetupCL {
 
         poolImplementation = new CLPool();
 
-        poolFactory = new CLFactory({_voter: address(voter), _poolImplementation: address(poolImplementation)});
+        address legacyPoolFactory = address(new MockCLFactory());
+        poolFactory = new CLFactory({
+            _voter: address(voter),
+            _clFactory: legacyPoolFactory,
+            _poolImplementation: address(poolImplementation)
+        });
 
         poolFactory.enableTickSpacing(10, 500);
         poolFactory.enableTickSpacing(60, 3_000);

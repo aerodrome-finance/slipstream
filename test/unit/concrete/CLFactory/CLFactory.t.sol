@@ -7,6 +7,7 @@ contract CLFactoryTest is BaseFixture {
     function test_InitialState() public virtual {
         assertEq(address(poolFactory.voter()), address(voter));
         assertEq(poolFactory.poolImplementation(), address(poolImplementation));
+        assertEq(address(poolFactory.legacyCLFactory()), address(legacyPoolFactory));
         assertEq(poolFactory.owner(), users.owner);
         assertEq(poolFactory.swapFeeModule(), address(customSwapFeeModule));
         assertEq(poolFactory.unstakedFeeModule(), address(customUnstakedFeeModule));

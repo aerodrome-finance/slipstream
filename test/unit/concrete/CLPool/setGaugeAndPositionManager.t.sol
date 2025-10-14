@@ -24,7 +24,11 @@ contract SetGaugeAndPositionManagerTest is CLPoolTest {
         );
 
         poolImplementation = new CLPool();
-        poolFactory = new CLFactory({_voter: address(voter), _poolImplementation: address(poolImplementation)});
+        poolFactory = new CLFactory({
+            _voter: address(voter),
+            _clFactory: address(legacyPoolFactory),
+            _poolImplementation: address(poolImplementation)
+        });
 
         gaugeImplementation = new CLGauge();
         gaugeFactory = new CLGaugeFactory({

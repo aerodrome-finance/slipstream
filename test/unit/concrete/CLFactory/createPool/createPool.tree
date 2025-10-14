@@ -1,0 +1,30 @@
+CreatePoolUnitConcreteTest
+├── When both tokens have the same address
+│   └── It should revert
+└── When both tokens do not have the same address
+    ├── When one of the tokens is the address zero
+    │   └── It should revert
+    └── When none of the tokens is the address zero
+        ├── When the tick spacing is not enabled
+        │   └── It should revert
+        └── When the tick spacing is enabled
+            ├── When the pool already exists
+            │   └── It should revert
+            └── When the pool does not exist
+                ├── When the pool does not exist in the legacy cl factory
+                │   ├── It should create the pool
+                │   ├── It should initialize the pool
+                │   ├── It should add the new pool to the pool array
+                │   ├── It should create a reference for the pool in the pool mappings
+                │   ├── It should flag that the new pool exists
+                │   └── It should emit a {PoolCreated} event
+                └── When the pool already exists in the legacy cl factory
+                    ├── When the caller is not the owner
+                    │   └── It should revert
+                    └── When the caller is the owner
+                        ├── It should create the pool
+                        ├── It should initialize the pool
+                        ├── It should add the new pool to the pool array
+                        ├── It should create a reference for the pool in the pool mappings
+                        ├── It should flag that the new pool exists
+                        └── It should emit a {PoolCreated} event

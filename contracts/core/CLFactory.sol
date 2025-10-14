@@ -21,6 +21,8 @@ contract CLFactory is ICLFactory {
     /// @inheritdoc ICLFactory
     IFactoryRegistry public immutable override factoryRegistry;
     /// @inheritdoc ICLFactory
+    ICLFactory public immutable override legacyCLFactory;
+    /// @inheritdoc ICLFactory
     address public override owner;
     /// @inheritdoc ICLFactory
     address public override swapFeeManager;
@@ -43,12 +45,13 @@ contract CLFactory is ICLFactory {
 
     int24[] private _tickSpacings;
 
-    constructor(address _voter, address _poolImplementation) {
+    constructor(address _voter, address _clFactory, address _poolImplementation) {
         owner = msg.sender;
         swapFeeManager = msg.sender;
         unstakedFeeManager = msg.sender;
         voter = IVoter(_voter);
         factoryRegistry = IVoter(_voter).factoryRegistry();
+        legacyCLFactory = ICLFactory(_clFactory);
         poolImplementation = _poolImplementation;
         defaultUnstakedFee = 100_000;
         emit OwnerChanged(address(0), msg.sender);
@@ -74,6 +77,10 @@ contract CLFactory is ICLFactory {
         require(token0 != address(0));
         require(tickSpacingToFee[tickSpacing] != 0);
         require(getPool[token0][token1][tickSpacing] == address(0));
+        if (legacyCLFactory.getPool({tokenA: token0, tokenB: token1, tickSpacing: tickSpacing}) != address(0)) {
+            require(msg.sender == owner);
+        }
+
         pool = Clones.cloneDeterministic({
             master: poolImplementation,
             salt: keccak256(abi.encode(token0, token1, tickSpacing))
