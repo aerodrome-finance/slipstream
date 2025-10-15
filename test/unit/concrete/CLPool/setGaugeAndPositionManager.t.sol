@@ -35,7 +35,8 @@ contract SetGaugeAndPositionManagerTest is CLPoolTest {
             _voter: address(voter),
             _implementation: address(gaugeImplementation),
             _emissionAdmin: users.owner,
-            _defaultCap: 100
+            _defaultCap: 100,
+            _legacyCLGaugeFactory: address(legacyGaugeFactory)
         });
 
         nftDescriptor = new NonfungibleTokenPositionDescriptor({

@@ -43,9 +43,10 @@ abstract contract Events {
     event ClaimRewards(address indexed from, uint256 amount);
 
     ///
-    /// CLGaugeFactoryV2 Events
+    /// CLGaugeFactory Events
     ///
     event SetEmissionAdmin(address indexed _emissionAdmin);
     event SetDefaultCap(uint256 indexed _newDefaultCap);
     event SetEmissionCap(address indexed _gauge, uint256 _newEmissionCap);
+    event SetRedistributor(address indexed _newRedistributor);
 }

@@ -43,6 +43,7 @@ contract NotifyRewardAmountTest is CLGaugeTest {
     }
 
     function test_NotifyRewardAmountUpdatesGaugeStateCorrectly() public {
+        uint256 epochStart = block.timestamp;
         skip(1 days);
 
         uint256 reward = TOKEN_1;
@@ -62,6 +63,7 @@ contract NotifyRewardAmountTest is CLGaugeTest {
         assertEq(gaugeRewardTokenBalance, reward);
 
         assertEq(gauge.rewardRate(), reward / 6 days);
+        assertEq(gauge.rewardsByEpoch(epochStart), reward);
         assertEq(gauge.periodFinish(), block.timestamp + 6 days);
         assertEq(pool.rewardRate(), reward / 6 days);
         assertEq(pool.rewardReserve(), reward);
@@ -69,6 +71,7 @@ contract NotifyRewardAmountTest is CLGaugeTest {
     }
 
     function test_NotifyRewardAmountUpdatesGaugeStateCorrectlyOnAdditionalRewardInSameEpoch() public {
+        uint256 epochStart = block.timestamp;
         skip(1 days);
 
         uint256 reward = TOKEN_1;
@@ -82,6 +85,8 @@ contract NotifyRewardAmountTest is CLGaugeTest {
 
         skip(1 days);
 
+        uint256 poolRollover = (reward / 6 days) * 1 days;
+
         gauge.notifyRewardAmount(reward);
         vm.stopPrank();
 
@@ -90,6 +95,7 @@ contract NotifyRewardAmountTest is CLGaugeTest {
 
         assertEq(gauge.rewardRate(), (reward * 2) / 5 days);
         assertEq(gauge.periodFinish(), block.timestamp + 5 days);
+        assertEq(gauge.rewardsByEpoch(epochStart), reward * 2 + poolRollover);
         assertEq(pool.rewardRate(), (reward * 2) / 5 days);
         assertEq(pool.rewardReserve(), reward + reward / (6 days) * (6 days));
         assertEq(pool.periodFinish(), block.timestamp + 5 days);
@@ -232,6 +238,7 @@ contract NotifyRewardAmountTest is CLGaugeTest {
 
         assertEq(gauge.rewardRate(), reward / (6 days));
         assertEq(gauge.rewardRateByEpoch(epochStart), reward / (6 days));
+        assertEq(gauge.rewardsByEpoch(epochStart), reward);
         assertEq(gauge.periodFinish(), block.timestamp + (6 days));
         (uint256 _token0, uint256 _token1) = pool.gaugeFees();
         assertEq(_token0, 1);
@@ -248,6 +255,7 @@ contract NotifyRewardAmountTest is CLGaugeTest {
 
         assertEq(gauge.rewardRate(), reward / (6 days) + reward / (5 days));
         assertEq(gauge.rewardRateByEpoch(epochStart), reward / (6 days) + reward / (5 days));
+        assertEq(gauge.rewardsByEpoch(epochStart), reward * 2);
         assertEq(gauge.periodFinish(), block.timestamp + (5 days));
         (_token0, _token1) = pool.gaugeFees();
         assertEq(_token0, 1);

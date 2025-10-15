@@ -9,6 +9,7 @@ import { MockVoter } from '../../../typechain/MockVoter'
 import { MockMinter } from '../../../typechain/MockMinter'
 import { CustomUnstakedFeeModule, MockFactoryRegistry, MockVotingRewardsFactory } from '../../../typechain'
 import { CLGaugeFactory } from '../../../typechain/CLGaugeFactory'
+import { MockCLGaugeFactory } from '../../../typechain/MockCLGaugeFactory'
 import { CLGauge } from '../../../typechain/CLGauge'
 import { encodePriceSqrt } from './utilities'
 
@@ -65,6 +66,7 @@ export const poolFixture: Fixture<PoolFixture> = async function (): Promise<Pool
   const MockMinterFactory = await ethers.getContractFactory('MockMinter')
   const GaugeImplementationFactory = await ethers.getContractFactory('CLGauge')
   const GaugeFactoryFactory = await ethers.getContractFactory('CLGaugeFactory')
+  const LegacyGaugeFactoryFactory = await ethers.getContractFactory('MockCLGaugeFactory')
   const MockFactoryRegistryFactory = await ethers.getContractFactory('MockFactoryRegistry')
   const MockVotingRewardsFactoryFactory = await ethers.getContractFactory('MockVotingRewardsFactory')
   const MockVotingEscrowFactory = await ethers.getContractFactory('MockVotingEscrow')
@@ -82,11 +84,13 @@ export const poolFixture: Fixture<PoolFixture> = async function (): Promise<Pool
     mockMinter.address
   )) as MockVoter
   const gaugeImplementation = (await GaugeImplementationFactory.deploy()) as CLGauge
+  const legacyGaugeFactory = (await LegacyGaugeFactoryFactory.deploy()) as MockCLGaugeFactory
   const gaugeFactory = (await GaugeFactoryFactory.deploy(
     mockVoter.address,
     gaugeImplementation.address,
     wallet.address,
-    100 // default cap
+    100, // default cap
+    legacyGaugeFactory.address
   )) as CLGaugeFactory
   // nft position manager stub, unused in hardhat tests
   await gaugeFactory.setNonfungiblePositionManager('0x0000000000000000000000000000000000000001')

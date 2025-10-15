@@ -13,6 +13,7 @@ import {
 } from "contracts/periphery/NonfungiblePositionManager.sol";
 import {CLGaugeFactory} from "contracts/gauge/CLGaugeFactory.sol";
 import {CLGauge} from "contracts/gauge/CLGauge.sol";
+import {MockCLGaugeFactory} from "contracts/test/MockCLGaugeFactory.sol";
 import {MockWETH} from "contracts/test/MockWETH.sol";
 import {MockCLFactory} from "contracts/test/MockCLFactory.sol";
 import {IVoter, MockVoter} from "contracts/test/MockVoter.sol";
@@ -34,6 +35,7 @@ import {CustomUnstakedFeeModule} from "contracts/core/fees/CustomUnstakedFeeModu
 import {CustomSwapFeeModule} from "contracts/core/fees/CustomSwapFeeModule.sol";
 import {DynamicSwapFeeModule} from "contracts/core/fees/DynamicSwapFeeModule.sol";
 import {IMinter} from "contracts/core/interfaces/IMinter.sol";
+import {MockRedistributor, IRedistributor} from "contracts/test/MockRedistributor.sol";
 
 abstract contract BaseFixture is Test, Constants, Events, PoolUtils {
     CLFactory public poolFactory;
@@ -42,7 +44,9 @@ abstract contract BaseFixture is Test, Constants, Events, PoolUtils {
     NonfungibleTokenPositionDescriptor public nftDescriptor;
     NonfungiblePositionManager public nft;
     CLGaugeFactory public gaugeFactory;
+    CLGaugeFactory public legacyGaugeFactory;
     CLGauge public gaugeImplementation;
+    IRedistributor public redistributor;
 
     /// @dev mocks
     IFactoryRegistry public factoryRegistry;
@@ -142,6 +146,9 @@ abstract contract BaseFixture is Test, Constants, Events, PoolUtils {
             abi.encodeWithSelector(CLGaugeFactory.calculateMaxEmissions.selector),
             abi.encode(type(uint256).max)
         );
+
+        vm.prank(users.owner);
+        gaugeFactory.setRedistributor(address(redistributor));
     }
 
     function deployContracts() public virtual {
@@ -163,12 +170,15 @@ abstract contract BaseFixture is Test, Constants, Events, PoolUtils {
 
         // deploy gauges and associated contracts
         gaugeImplementation = new CLGauge();
+        legacyGaugeFactory = CLGaugeFactory(address(new MockCLGaugeFactory()));
         gaugeFactory = new CLGaugeFactory({
             _voter: address(voter),
             _implementation: address(gaugeImplementation),
             _emissionAdmin: users.owner,
-            _defaultCap: 100
+            _defaultCap: 100,
+            _legacyCLGaugeFactory: address(legacyGaugeFactory)
         });
+        redistributor = IRedistributor(address(new MockRedistributor({_rewardToken: address(rewardToken)})));
 
         // deploy nft manager and descriptor
         nftDescriptor = new NonfungibleTokenPositionDescriptor({

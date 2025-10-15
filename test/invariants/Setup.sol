@@ -17,6 +17,7 @@ import {
     INonfungiblePositionManager, NonfungiblePositionManager
 } from "contracts/periphery/NonfungiblePositionManager.sol";
 import {CLGaugeFactory} from "contracts/gauge/CLGaugeFactory.sol";
+import {MockCLGaugeFactory} from "contracts/test/MockCLGaugeFactory.sol";
 import {CLGauge} from "contracts/gauge/CLGauge.sol";
 import {MockWETH} from "contracts/test/MockWETH.sol";
 import {IVotingRewardsFactory, MockVotingRewardsFactory} from "contracts/test/MockVotingRewardsFactory.sol";
@@ -131,11 +132,13 @@ contract SetupCL {
 
         // deploy gauges and associated contracts
         gaugeImplementation = new CLGauge();
+        address legacyGaugeFactory = address(new MockCLGaugeFactory());
         gaugeFactory = new CLGaugeFactory({
             _voter: address(voter),
             _implementation: address(gaugeImplementation),
             _emissionAdmin: address(this),
-            _defaultCap: 100
+            _defaultCap: 100,
+            _legacyCLGaugeFactory: legacyGaugeFactory
         });
 
         // deploy nft manager

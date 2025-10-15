@@ -9,7 +9,6 @@ abstract contract CLGaugeForkTest is BaseForkFixture {
     CLGauge public gauge;
 
     function test_InitialState() public view {
-        assertEq(gauge.minter(), address(minter));
         assertEq(address(gauge.nft()), address(nft));
         assertEq(address(gauge.voter()), address(voter));
         assertEq(address(gauge.pool()), address(pool));
@@ -29,5 +28,6 @@ abstract contract CLGaugeForkTest is BaseForkFixture {
         assertEq(gauge.rewardToken(), address(rewardToken));
         assertTrue(gauge.isPool());
         assertFalse(gauge.supportsPayable());
+        assertEq(gauge.rewardsByEpoch(block.timestamp), 0);
     }
 }

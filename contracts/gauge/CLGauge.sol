@@ -17,6 +17,7 @@ import {FullMath} from "contracts/core/libraries/FullMath.sol";
 import {FixedPoint128} from "contracts/core/libraries/FixedPoint128.sol";
 import {ProtocolTimeLibrary} from "contracts/libraries/ProtocolTimeLibrary.sol";
 import {IReward} from "contracts/gauge/interfaces/IReward.sol";
+import {IRedistributor} from "contracts/gauge/interfaces/IRedistributor.sol";
 
 contract CLGauge is ICLGauge, ERC721Holder, ReentrancyGuard {
     using EnumerableSet for EnumerableSet.UintSet;
@@ -26,8 +27,6 @@ contract CLGauge is ICLGauge, ERC721Holder, ReentrancyGuard {
     INonfungiblePositionManager public override nft;
     /// @inheritdoc ICLGauge
     IVoter public override voter;
-    /// @inheritdoc ICLGauge
-    address public override minter;
     /// @inheritdoc ICLGauge
     ICLPool public override pool;
     /// @inheritdoc ICLGauge
@@ -43,7 +42,11 @@ contract CLGauge is ICLGauge, ERC721Holder, ReentrancyGuard {
     /// @inheritdoc ICLGauge
     uint256 public override rewardRate;
 
-    mapping(uint256 => uint256) public override rewardRateByEpoch; // epochStart => rewardRate
+    /// @inheritdoc ICLGauge
+    mapping(uint256 => uint256) public override rewardsByEpoch;
+
+    /// @inheritdoc ICLGauge
+    mapping(uint256 => uint256) public override rewardRateByEpoch;
     /// @dev The set of all staked nfts for a given address
     mapping(address => EnumerableSet.UintSet) internal _stakes;
     /// @inheritdoc ICLGauge
@@ -98,7 +101,6 @@ contract CLGauge is ICLGauge, ERC721Holder, ReentrancyGuard {
         tickSpacing = _tickSpacing;
         isPool = _isPool;
         supportsPayable = _token0 == _weth || _token1 == _weth;
-        minter = IVoter(_voter).minter();
     }
 
     receive() external payable {
@@ -281,9 +283,13 @@ contract CLGauge is ICLGauge, ERC721Holder, ReentrancyGuard {
         _claimFees();
 
         uint256 maxAmount = gaugeFactory.calculateMaxEmissions({_gauge: address(this)});
-        /// @dev If emission cap is exceeded, transfer excess emissions back to Minter
+        /// @dev If emission cap is exceeded, transfer excess emissions back to Redistributor
         if (_amount > maxAmount) {
-            TransferHelper.safeTransferFrom(rewardToken, sender, minter, _amount - maxAmount);
+            uint256 excess = _amount - maxAmount;
+            address redistributor = gaugeFactory.redistributor();
+            TransferHelper.safeTransferFrom(rewardToken, sender, address(this), excess);
+            TransferHelper.safeApprove(rewardToken, redistributor, excess);
+            IRedistributor(redistributor).deposit({_amount: excess});
             _amount = maxAmount;
         }
         _notifyRewardAmount(sender, _amount);
@@ -292,7 +298,7 @@ contract CLGauge is ICLGauge, ERC721Holder, ReentrancyGuard {
     /// @inheritdoc ICLGauge
     function notifyRewardWithoutClaim(uint256 _amount) external override nonReentrant {
         address sender = msg.sender;
-        require(sender == gaugeFactory.notifyAdmin(), "NA");
+        require(sender == gaugeFactory.notifyAdmin() || sender == gaugeFactory.redistributor(), "NA");
         require(_amount != 0, "ZR");
         _notifyRewardAmount(sender, _amount);
     }
@@ -315,8 +321,11 @@ contract CLGauge is ICLGauge, ERC721Holder, ReentrancyGuard {
             rewardRate = (_amount + _leftover) / timeUntilNext;
             pool.syncReward({rewardRate: rewardRate, rewardReserve: _amount + _leftover, periodFinish: nextPeriodFinish});
         }
-        rewardRateByEpoch[ProtocolTimeLibrary.epochStart(timestamp)] = rewardRate;
+        uint256 epochStart = ProtocolTimeLibrary.epochStart(timestamp);
+        rewardRateByEpoch[epochStart] = rewardRate;
         require(rewardRate != 0, "ZRR");
+
+        rewardsByEpoch[epochStart] += _amount;
 
         // Ensure the provided reward amount is not more than the balance in the contract.
         // This keeps the reward rate in the right range

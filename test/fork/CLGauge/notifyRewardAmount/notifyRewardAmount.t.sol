@@ -69,9 +69,10 @@ contract NotifyRewardAmountIntegrationConcreteTest is CLGaugeForkTest {
         whenTailEmissionsHaveStarted
         whenTheAmountIsGreaterThanDefinedPercentageOfTailEmissions
     {
-        // It should return excess emissions to minter
+        // It should return excess emissions to redistributor
         // It should update the reward rate
         // It should cache the updated reward rate for this epoch
+        // It should update the rewards deposited for this epoch
         // It should update the period finish timestamp
         // It should emit a {NotifyReward} event
         uint256 weeklyEmissions = (rewardToken.totalSupply() * minter.tailEmissionRate()) / MAX_BPS;
@@ -89,13 +90,16 @@ contract NotifyRewardAmountIntegrationConcreteTest is CLGaugeForkTest {
         emit NotifyReward({from: address(voter), amount: maxAmount});
         gauge.notifyRewardAmount({_amount: amount});
 
-        // Minter received excess emissions
-        assertEq(rewardToken.balanceOf(address(minter)), oldMinterBalance + TOKEN_1);
+        // Redistributor received excess emissions
+        assertEq(rewardToken.balanceOf(address(minter)), oldMinterBalance);
+        assertEq(rewardToken.balanceOf(address(redistributor)), TOKEN_1);
         assertEq(rewardToken.balanceOf(address(voter)), 0);
         assertEq(rewardToken.balanceOf(address(gauge)), maxAmount);
 
+        uint256 epochStart = ProtocolTimeLibrary.epochStart(block.timestamp);
         assertEq(gauge.rewardRate(), maxAmount / WEEK);
-        assertEq(gauge.rewardRateByEpoch(ProtocolTimeLibrary.epochStart(block.timestamp)), maxAmount / WEEK);
+        assertEq(gauge.rewardRateByEpoch(epochStart), maxAmount / WEEK);
+        assertEq(gauge.rewardsByEpoch(epochStart), maxAmount);
         assertEq(gauge.periodFinish(), block.timestamp + WEEK);
         assertEq(pool.rewardRate(), maxAmount / WEEK);
         assertEq(pool.rewardReserve(), maxAmount);
@@ -108,9 +112,10 @@ contract NotifyRewardAmountIntegrationConcreteTest is CLGaugeForkTest {
         whenTailEmissionsHaveStarted
         whenTheAmountIsGreaterThanDefinedPercentageOfTailEmissions
     {
-        // It should return excess emissions to minter
+        // It should return excess emissions to redistributor
         // It should update the reward rate, including any existing rewards
         // It should cache the updated reward rate for this epoch
+        // It should update the rewards deposited for this epoch
         // It should update the period finish timestamp
         // It should emit a {NotifyReward} event
         uint256 weeklyEmissions = (rewardToken.totalSupply() * minter.tailEmissionRate()) / MAX_BPS;
@@ -124,6 +129,8 @@ contract NotifyRewardAmountIntegrationConcreteTest is CLGaugeForkTest {
         // inital deposit of partial amount
         gauge.notifyRewardAmount({_amount: maxAmount});
 
+        uint256 epochStart = ProtocolTimeLibrary.epochStart(block.timestamp);
+        assertEq(gauge.rewardsByEpoch(epochStart), maxAmount);
         assertEq(pool.rewardRate(), maxAmount / WEEK);
         assertEq(pool.rewardReserve(), maxAmount);
         assertEq(pool.periodFinish(), block.timestamp + WEEK);
@@ -138,14 +145,16 @@ contract NotifyRewardAmountIntegrationConcreteTest is CLGaugeForkTest {
         emit NotifyReward({from: address(voter), amount: maxAmount + poolRollover});
         gauge.notifyRewardAmount({_amount: amount});
 
-        // Minter received excess emissions
-        assertEq(rewardToken.balanceOf(address(minter)), oldMinterBalance + TOKEN_1);
+        // Redistributor received excess emissions
+        assertEq(rewardToken.balanceOf(address(minter)), oldMinterBalance);
+        assertEq(rewardToken.balanceOf(address(redistributor)), TOKEN_1);
         assertEq(rewardToken.balanceOf(address(voter)), amount - maxAmount);
         assertEq(rewardToken.balanceOf(address(gauge)), maxAmount * 2);
 
         uint256 rewardRate = ((maxAmount / WEEK) * timeUntilNext + maxAmount + poolRollover) / timeUntilNext;
         assertEq(gauge.rewardRate(), rewardRate);
         assertEq(gauge.rewardRateByEpoch(ProtocolTimeLibrary.epochStart(block.timestamp)), rewardRate);
+        assertEq(gauge.rewardsByEpoch(epochStart), maxAmount * 2 + poolRollover);
         assertEq(gauge.periodFinish(), block.timestamp + WEEK / 7 * 2);
         assertEq(pool.rewardRate(), rewardRate);
         assertEq(pool.rewardReserve(), maxAmount + poolRollover + ((maxAmount / WEEK) * timeUntilNext));
@@ -164,6 +173,7 @@ contract NotifyRewardAmountIntegrationConcreteTest is CLGaugeForkTest {
     {
         // It should update the reward rate
         // It should cache the updated reward rate for this epoch
+        // It should update the rewards deposited for this epoch
         // It should update the period finish timestamp
         // It should emit a {NotifyReward} event
 
@@ -178,10 +188,12 @@ contract NotifyRewardAmountIntegrationConcreteTest is CLGaugeForkTest {
         emit NotifyReward({from: address(voter), amount: amount});
         gauge.notifyRewardAmount({_amount: amount});
 
+        uint256 epochStart = ProtocolTimeLibrary.epochStart(block.timestamp);
         assertEq(rewardToken.balanceOf(address(voter)), 0);
         assertEq(rewardToken.balanceOf(address(gauge)), amount);
         assertEq(gauge.rewardRate(), amount / WEEK);
-        assertEq(gauge.rewardRateByEpoch(ProtocolTimeLibrary.epochStart(block.timestamp)), amount / WEEK);
+        assertEq(gauge.rewardRateByEpoch(epochStart), amount / WEEK);
+        assertEq(gauge.rewardsByEpoch(epochStart), amount);
         assertEq(gauge.periodFinish(), block.timestamp + WEEK);
         assertEq(pool.rewardRate(), amount / WEEK);
         assertEq(pool.rewardReserve(), amount);
@@ -196,6 +208,7 @@ contract NotifyRewardAmountIntegrationConcreteTest is CLGaugeForkTest {
     {
         // It should update the reward rate, including any existing rewards
         // It should cache the updated reward rate for this epoch
+        // It should update the rewards deposited for this epoch
         // It should update the period finish timestamp
         // It should emit a {NotifyReward} event
         uint256 amount = TOKEN_1 * 1_000;
@@ -210,6 +223,8 @@ contract NotifyRewardAmountIntegrationConcreteTest is CLGaugeForkTest {
 
         uint256 timeUntilNext = WEEK * 2 / 7;
 
+        uint256 epochStart = ProtocolTimeLibrary.epochStart(block.timestamp);
+        assertEq(gauge.rewardsByEpoch(epochStart), amount);
         assertEq(pool.rewardRate(), amount / WEEK);
         assertEq(pool.rewardReserve(), amount);
         assertEq(pool.periodFinish(), block.timestamp + timeUntilNext);
@@ -224,7 +239,8 @@ contract NotifyRewardAmountIntegrationConcreteTest is CLGaugeForkTest {
 
         uint256 rewardRate = ((amount / WEEK) * timeUntilNext + amount + poolRollover) / timeUntilNext;
         assertEq(gauge.rewardRate(), rewardRate);
-        assertEq(gauge.rewardRateByEpoch(ProtocolTimeLibrary.epochStart(block.timestamp)), rewardRate);
+        assertEq(gauge.rewardRateByEpoch(epochStart), rewardRate);
+        assertEq(gauge.rewardsByEpoch(epochStart), amount * 2 + poolRollover);
         assertEq(gauge.periodFinish(), block.timestamp + WEEK / 7 * 2);
         assertEq(pool.rewardRate(), rewardRate);
         assertEq(pool.rewardReserve(), amount + poolRollover + ((amount / WEEK) * timeUntilNext));
@@ -246,9 +262,10 @@ contract NotifyRewardAmountIntegrationConcreteTest is CLGaugeForkTest {
         whenTailEmissionsHaveNotStarted
         whenTheAmountIsGreaterThanDefinedPercentageOfWeeklyEmissions
     {
-        // It should return excess emissions to minter
+        // It should return excess emissions to redistributor
         // It should update the reward rate
         // It should cache the updated reward rate for this epoch
+        // It should update the rewards deposited for this epoch
         // It should update the period finish timestamp
         // It should emit a {NotifyReward} event
         uint256 weeklyEmissions = (minter.weekly() * MAX_BPS) / WEEKLY_DECAY;
@@ -266,13 +283,16 @@ contract NotifyRewardAmountIntegrationConcreteTest is CLGaugeForkTest {
         emit NotifyReward({from: address(voter), amount: maxAmount});
         gauge.notifyRewardAmount({_amount: amount});
 
-        // Minter received excess emissions
-        assertEq(rewardToken.balanceOf(address(minter)), oldMinterBalance + TOKEN_1);
+        // Redistributor received excess emissions
+        assertEq(rewardToken.balanceOf(address(minter)), oldMinterBalance);
+        assertEq(rewardToken.balanceOf(address(redistributor)), TOKEN_1);
         assertEq(rewardToken.balanceOf(address(voter)), 0);
         assertEq(rewardToken.balanceOf(address(gauge)), maxAmount);
 
+        uint256 epochStart = ProtocolTimeLibrary.epochStart(block.timestamp);
         assertEq(gauge.rewardRate(), maxAmount / WEEK);
-        assertEq(gauge.rewardRateByEpoch(ProtocolTimeLibrary.epochStart(block.timestamp)), maxAmount / WEEK);
+        assertEq(gauge.rewardRateByEpoch(epochStart), maxAmount / WEEK);
+        assertEq(gauge.rewardsByEpoch(epochStart), maxAmount);
         assertEq(gauge.periodFinish(), block.timestamp + WEEK);
         assertEq(pool.rewardRate(), maxAmount / WEEK);
         assertEq(pool.rewardReserve(), maxAmount);
@@ -285,9 +305,10 @@ contract NotifyRewardAmountIntegrationConcreteTest is CLGaugeForkTest {
         whenTailEmissionsHaveNotStarted
         whenTheAmountIsGreaterThanDefinedPercentageOfWeeklyEmissions
     {
-        // It should return excess emissions to minter
+        // It should return excess emissions to redistributor
         // It should update the reward rate, including any existing rewards
         // It should cache the updated reward rate for this epoch
+        // It should update the rewards deposited for this epoch
         // It should update the period finish timestamp
         // It should emit a {NotifyReward} event
         uint256 weeklyEmissions = (minter.weekly() * MAX_BPS) / WEEKLY_DECAY;
@@ -315,14 +336,17 @@ contract NotifyRewardAmountIntegrationConcreteTest is CLGaugeForkTest {
         emit NotifyReward({from: address(voter), amount: maxAmount + poolRollover});
         gauge.notifyRewardAmount({_amount: amount});
 
-        // Minter received excess emissions
-        assertEq(rewardToken.balanceOf(address(minter)), oldMinterBalance + TOKEN_1);
+        // Redistributor received excess emissions
+        assertEq(rewardToken.balanceOf(address(minter)), oldMinterBalance);
+        assertEq(rewardToken.balanceOf(address(redistributor)), TOKEN_1);
         assertEq(rewardToken.balanceOf(address(voter)), amount - maxAmount);
         assertEq(rewardToken.balanceOf(address(gauge)), maxAmount * 2);
 
         uint256 rewardRate = ((maxAmount / WEEK) * timeUntilNext + maxAmount + poolRollover) / timeUntilNext;
+        uint256 epochStart = ProtocolTimeLibrary.epochStart(block.timestamp);
         assertEq(gauge.rewardRate(), rewardRate);
-        assertEq(gauge.rewardRateByEpoch(ProtocolTimeLibrary.epochStart(block.timestamp)), rewardRate);
+        assertEq(gauge.rewardRateByEpoch(epochStart), rewardRate);
+        assertEq(gauge.rewardsByEpoch(epochStart), maxAmount * 2 + poolRollover);
         assertEq(gauge.periodFinish(), block.timestamp + WEEK / 7 * 2);
         assertEq(pool.rewardRate(), rewardRate);
         assertEq(pool.rewardReserve(), maxAmount + poolRollover + ((maxAmount / WEEK) * timeUntilNext));
@@ -341,6 +365,7 @@ contract NotifyRewardAmountIntegrationConcreteTest is CLGaugeForkTest {
     {
         // It should update the reward rate
         // It should cache the updated reward rate for this epoch
+        // It should update the rewards deposited for this epoch
         // It should update the period finish timestamp
         // It should emit a {NotifyReward} event
         uint256 amount = TOKEN_1 * 1_000;
@@ -355,10 +380,12 @@ contract NotifyRewardAmountIntegrationConcreteTest is CLGaugeForkTest {
         emit NotifyReward({from: address(voter), amount: amount});
         gauge.notifyRewardAmount({_amount: amount});
 
+        uint256 epochStart = ProtocolTimeLibrary.epochStart(block.timestamp);
         assertEq(rewardToken.balanceOf(address(voter)), 0);
         assertEq(rewardToken.balanceOf(address(gauge)), amount);
         assertEq(gauge.rewardRate(), amount / WEEK);
-        assertEq(gauge.rewardRateByEpoch(ProtocolTimeLibrary.epochStart(block.timestamp)), amount / WEEK);
+        assertEq(gauge.rewardRateByEpoch(epochStart), amount / WEEK);
+        assertEq(gauge.rewardsByEpoch(epochStart), amount);
         assertEq(gauge.periodFinish(), block.timestamp + WEEK);
         assertEq(pool.rewardRate(), amount / WEEK);
         assertEq(pool.rewardReserve(), amount);
@@ -373,6 +400,7 @@ contract NotifyRewardAmountIntegrationConcreteTest is CLGaugeForkTest {
     {
         // It should update the reward rate, including any existing rewards
         // It should cache the updated reward rate for this epoch
+        // It should update the rewards deposited for this epoch
         // It should update the period finish timestamp
         // It should emit a {NotifyReward} event
         uint256 amount = TOKEN_1 * 1_000;
@@ -383,6 +411,8 @@ contract NotifyRewardAmountIntegrationConcreteTest is CLGaugeForkTest {
         // inital deposit of partial amount
         gauge.notifyRewardAmount({_amount: amount});
 
+        uint256 epochStart = ProtocolTimeLibrary.epochStart(block.timestamp);
+        assertEq(gauge.rewardsByEpoch(epochStart), amount);
         assertEq(pool.rewardRate(), amount / WEEK);
         assertEq(pool.rewardReserve(), amount);
         assertEq(pool.periodFinish(), block.timestamp + WEEK);
@@ -405,7 +435,8 @@ contract NotifyRewardAmountIntegrationConcreteTest is CLGaugeForkTest {
 
         uint256 rewardRate = ((amount / WEEK) * timeUntilNext + amount + poolRollover) / timeUntilNext;
         assertEq(gauge.rewardRate(), rewardRate);
-        assertEq(gauge.rewardRateByEpoch(ProtocolTimeLibrary.epochStart(block.timestamp)), rewardRate);
+        assertEq(gauge.rewardRateByEpoch(epochStart), rewardRate);
+        assertEq(gauge.rewardsByEpoch(epochStart), amount * 2 + poolRollover);
         assertEq(gauge.periodFinish(), block.timestamp + (WEEK / 7 * 2));
         assertEq(pool.rewardRate(), rewardRate);
         assertEq(pool.rewardReserve(), amount + poolRollover + ((amount / WEEK) * timeUntilNext));

@@ -74,5 +74,14 @@ abstract contract BaseForkFixture is BaseFixture {
         poolFactory.setSwapFeeModule(address(customSwapFeeModule));
         poolFactory.setUnstakedFeeModule(address(customUnstakedFeeModule));
         vm.stopPrank();
+
+        vm.prank(escrow.team());
+        escrow.setTeam({_team: address(redistributor)});
+
+        vm.prank(legacyGaugeFactory.notifyAdmin());
+        legacyGaugeFactory.setNotifyAdmin({_admin: address(redistributor)});
+
+        vm.prank(users.owner);
+        gaugeFactory.setRedistributor({_redistributor: address(redistributor)});
     }
 }

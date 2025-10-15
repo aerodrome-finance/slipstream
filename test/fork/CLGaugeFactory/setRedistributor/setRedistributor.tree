@@ -1,0 +1,15 @@
+SetRedistributorIntegrationConcreteTest
+├── When caller is not the emission admin
+│   └── It should revert with {NotAuthorized}
+└── When caller is the emission admin
+        ├── When redistributor is zero address
+        │   └── It should revert with {ZeroAddress}
+        └── When redistributor is not zero address
+            ├── When redistributor is voting escrow team
+            │   └── It should revert with {EscrowTeam}
+            └── When redistributor is not voting escrow team 
+                ├── When redistributor is the legacy gauge factory notify admin
+                │   └── It should revert with {LegacyNotifyAdmin}
+                └── When redistributor is not the legacy gauge factory notify admin
+                    ├── It should set the new redistributor
+                    └── It should emit a {SetRedistributor} event

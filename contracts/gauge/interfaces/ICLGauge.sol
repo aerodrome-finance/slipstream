@@ -19,9 +19,6 @@ interface ICLGauge {
     /// @notice Voter contract gauge receives emissions from
     function voter() external view returns (IVoter);
 
-    /// @notice Minter contract used to mint emissions
-    function minter() external view returns (address);
-
     /// @notice Address of the CL pool linked to the gauge
     function pool() external view returns (ICLPool);
 
@@ -36,6 +33,11 @@ interface ICLGauge {
 
     /// @notice Current reward rate of rewardToken to distribute per second
     function rewardRate() external view returns (uint256);
+
+    /// @notice Returns the amount of emissions deposited into a gauge in a given epoch
+    /// @param _epochStart The start of the epoch to view the emissions for
+    /// @return The emissions distributed to the gauge in the given epoch
+    function rewardsByEpoch(uint256 _epochStart) external view returns (uint256);
 
     /// @notice Claimable rewards by tokenId
     function rewards(uint256 tokenId) external view returns (uint256);

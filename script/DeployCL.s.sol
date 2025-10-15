@@ -36,6 +36,7 @@ contract DeployCL is Script {
     address public emissionAdmin;
     address public factoryV2;
     address public legacyCLFactory;
+    address public legacyCLGaugeFactory;
     string public nftName;
     string public nftSymbol;
 
@@ -68,6 +69,7 @@ contract DeployCL is Script {
         emissionAdmin = abi.decode(vm.parseJson(jsonConstants, ".emissionAdmin"), (address));
         factoryV2 = abi.decode(vm.parseJson(jsonConstants, ".factoryV2"), (address));
         legacyCLFactory = abi.decode(vm.parseJson(jsonConstants, ".legacyCLFactory"), (address));
+        legacyCLGaugeFactory = abi.decode(vm.parseJson(jsonConstants, ".legacyCLGaugeFactory"), (address));
         nftName = abi.decode(vm.parseJson(jsonConstants, ".nftName"), (string));
         nftSymbol = abi.decode(vm.parseJson(jsonConstants, ".nftSymbol"), (string));
 
@@ -88,7 +90,8 @@ contract DeployCL is Script {
             _voter: address(voter),
             _implementation: address(gaugeImplementation),
             _emissionAdmin: emissionAdmin,
-            _defaultCap: 100
+            _defaultCap: 100,
+            _legacyCLGaugeFactory: legacyCLGaugeFactory
         });
 
         // deploy nft contracts

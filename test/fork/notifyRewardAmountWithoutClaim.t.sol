@@ -30,6 +30,7 @@ contract NotifyRewardAmountWithoutClaimForkTest is BaseForkFixture {
     }
 
     function testFork_NotifyRewardAmountWithoutClaimResetsRewardRateInKilledGauge() public {
+        uint256 epochStart = block.timestamp;
         skip(1 days);
 
         uint256 reward = TOKEN_1;
@@ -51,6 +52,7 @@ contract NotifyRewardAmountWithoutClaimForkTest is BaseForkFixture {
         assertEq(gaugeRewardTokenBalance, reward);
 
         assertEq(gauge.rewardRate(), reward / 6 days);
+        assertEq(gauge.rewardsByEpoch(epochStart), reward);
         assertEq(gauge.lastUpdateTime(tokenId), block.timestamp);
         assertEq(gauge.periodFinish(), block.timestamp + 6 days);
 
@@ -58,13 +60,15 @@ contract NotifyRewardAmountWithoutClaimForkTest is BaseForkFixture {
         voter.killGauge(address(gauge));
 
         skipToNextEpoch(0);
+        epochStart = block.timestamp;
 
-        vm.startPrank(users.owner);
-        deal(address(rewardToken), users.owner, 604_800);
+        vm.startPrank(address(redistributor));
+        deal(address(rewardToken), address(redistributor), 604_800);
         rewardToken.approve(address(gauge), 604_800);
         gauge.notifyRewardWithoutClaim(604_800); // requires minimum value of 604800
 
         assertEq(gauge.rewardRate(), 1); // reset to token amount
+        assertEq(gauge.rewardsByEpoch(epochStart), 604_800);
         assertEq(gauge.lastUpdateTime(tokenId), block.timestamp - 6 days);
         assertEq(gauge.periodFinish(), block.timestamp + WEEK);
     }

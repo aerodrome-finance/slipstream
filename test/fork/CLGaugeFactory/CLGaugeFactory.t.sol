@@ -36,5 +36,8 @@ abstract contract CLGaugeFactoryForkTest is BaseForkFixture {
         assertEq(gaugeFactory.defaultCap(), 100);
         assertEq(gaugeFactory.weeklyEmissions(), 0);
         assertEq(gaugeFactory.activePeriod(), 0);
+        assertTrue(gaugeFactory.isGauge(address(gauge)));
+        assertEq(gaugeFactory.redistributor(), address(redistributor));
+        assertEq(address(gaugeFactory.legacyCLGaugeFactory()), address(legacyGaugeFactory));
     }
 }

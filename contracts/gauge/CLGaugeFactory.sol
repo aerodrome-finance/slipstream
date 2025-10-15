@@ -3,6 +3,7 @@ pragma solidity =0.7.6;
 
 import "contracts/core/interfaces/ICLPool.sol";
 import "contracts/core/interfaces/IMinter.sol";
+import "contracts/core/interfaces/IVotingEscrow.sol";
 import "./interfaces/ICLGaugeFactory.sol";
 import "./CLGauge.sol";
 import "@openzeppelin/contracts/proxy/Clones.sol";
@@ -20,10 +21,14 @@ contract CLGaugeFactory is ICLGaugeFactory {
     /// @inheritdoc ICLGaugeFactory
     address public immutable override minter;
     /// @inheritdoc ICLGaugeFactory
+    ICLGaugeFactory public immutable override legacyCLGaugeFactory;
+    /// @inheritdoc ICLGaugeFactory
     address public immutable override rewardToken;
     /// @inheritdoc ICLGaugeFactory
     address public immutable override implementation;
 
+    /// @inheritdoc ICLGaugeFactory
+    address public override redistributor;
     /// @inheritdoc ICLGaugeFactory
     address public override nft;
     /// @inheritdoc ICLGaugeFactory
@@ -36,18 +41,27 @@ contract CLGaugeFactory is ICLGaugeFactory {
     uint256 public override weeklyEmissions;
     /// @inheritdoc ICLGaugeFactory
     uint256 public override activePeriod;
+    /// @inheritdoc ICLGaugeFactory
+    mapping(address => bool) public override isGauge;
     /// @dev Emission cap for each gauge
     mapping(address => uint256) internal _emissionCaps;
 
     address private owner;
 
-    constructor(address _voter, address _implementation, address _emissionAdmin, uint256 _defaultCap) {
+    constructor(
+        address _voter,
+        address _implementation,
+        address _emissionAdmin,
+        uint256 _defaultCap,
+        address _legacyCLGaugeFactory
+    ) {
         voter = _voter;
         owner = msg.sender;
         notifyAdmin = msg.sender;
         implementation = _implementation;
         address _minter = IVoter(_voter).minter();
         minter = _minter;
+        legacyCLGaugeFactory = ICLGaugeFactory(_legacyCLGaugeFactory);
         rewardToken = address(IMinter(_minter).aero());
         emissionAdmin = _emissionAdmin;
         defaultCap = _defaultCap;
@@ -85,6 +99,18 @@ contract CLGaugeFactory is ICLGaugeFactory {
         require(_emissionCap <= MAX_BPS, "MC");
         _emissionCaps[_gauge] = _emissionCap;
         emit SetEmissionCap({_gauge: _gauge, _newEmissionCap: _emissionCap});
+    }
+
+    /// @inheritdoc ICLGaugeFactory
+    function setRedistributor(address _redistributor) external override {
+        require(msg.sender == emissionAdmin, "NA");
+        require(_redistributor != address(0), "ZA");
+        // must transfer team and notify admin permissions before changing this value
+        require(redistributor != IVotingEscrow(IVoter(voter).ve()).team(), "ET");
+        require(redistributor != legacyCLGaugeFactory.notifyAdmin(), "LNA");
+
+        redistributor = _redistributor;
+        emit SetRedistributor({_newRedistributor: _redistributor});
     }
 
     /// @inheritdoc ICLGaugeFactory
@@ -127,6 +153,7 @@ contract CLGaugeFactory is ICLGaugeFactory {
             _isPool: _isPool
         });
         ICLPool(_pool).setGaugeAndPositionManager({_gauge: _gauge, _nft: nft});
+        isGauge[_gauge] = true;
     }
 
     /// @inheritdoc ICLGaugeFactory

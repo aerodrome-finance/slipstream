@@ -6,6 +6,7 @@ interface ICLGaugeFactory {
     event SetEmissionAdmin(address indexed _emissionAdmin);
     event SetDefaultCap(uint256 indexed _newDefaultCap);
     event SetEmissionCap(address indexed _gauge, uint256 _newEmissionCap);
+    event SetRedistributor(address indexed _newRedistributor);
 
     /// @notice Denominator for emission calculations (as basis points)
     function MAX_BPS() external view returns (uint256);
@@ -21,6 +22,11 @@ interface ICLGaugeFactory {
 
     /// @notice Minter contract used to mint emissions
     function minter() external view returns (address);
+
+    /// @notice The address of the legacy CLGaugeFactory
+    /// @dev The legacy CLGaugeFactory that operates concurrently with this gauge factory
+    /// @return The address of the legacy gauge factory
+    function legacyCLGaugeFactory() external view returns (ICLGaugeFactory);
 
     /// @notice Reward token supported by this factory
     function rewardToken() external view returns (address);
@@ -46,6 +52,14 @@ interface ICLGaugeFactory {
     /// @notice Timestamp of start of epoch that `calculateMaxEmissions()` was last called in
     function activePeriod() external view returns (uint256);
 
+    /// @notice Address of the Redistributor contract to send excess emissions to
+    function redistributor() external view returns (address);
+
+    /// @notice Checks if the given address is a gauge created by this factory
+    /// @param _gauge The address to check
+    /// @return Whether the given address is a gauge created by this factory
+    function isGauge(address _gauge) external view returns (bool);
+
     /// @notice Returns the emission cap of a Gauge
     /// @param _gauge The gauge we are viewing the emission cap of
     /// @return The emission cap of the gauge
@@ -68,6 +82,13 @@ interface ICLGaugeFactory {
     /// @param _gauge Address of the gauge contract
     /// @param _emissionCap The emission cap to be set
     function setEmissionCap(address _gauge, uint256 _emissionCap) external;
+
+    /// @notice Sets a new redistributor contract
+    /// @param _redistributor Address of the new redistributor contract
+    /// @dev Only callable by the emission admin
+    /// @dev The redistributor permissions (escrow.team or notifyAdmin in legacy gauge factory) should be transferred beforehand.
+    /// @dev Will revert if the current redistributor still holds permissions.
+    function setRedistributor(address _redistributor) external;
 
     /// @notice Sets the default emission cap for gauges
     /// @param _defaultCap The default emission cap to be set

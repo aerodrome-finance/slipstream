@@ -45,6 +45,7 @@ contract CreateGaugeTest is CLGaugeFactoryTest {
         assertEq(address(gauge.gaugeFactory()), address(gaugeFactory));
         assertFalse(gauge.supportsPayable());
         assertEq(gauge.isPool(), true);
+        assertTrue(gaugeFactory.isGauge(address(gauge)));
     }
 
     function test_CreateGauge_WithPayableSupport() public {
@@ -63,5 +64,6 @@ contract CreateGaugeTest is CLGaugeFactoryTest {
         assertEq(address(gauge.gaugeFactory()), address(gaugeFactory));
         assertTrue(gauge.supportsPayable());
         assertEq(gauge.isPool(), true);
+        assertTrue(gaugeFactory.isGauge(address(gauge)));
     }
 }

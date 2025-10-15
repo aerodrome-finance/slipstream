@@ -13,6 +13,7 @@ import { MockVoter } from '../../../typechain/MockVoter'
 import { MockMinter } from '../../../typechain/MockMinter'
 import { CustomUnstakedFeeModule, MockVotingRewardsFactory } from '../../../typechain'
 import { CLGaugeFactory } from '../../../typechain/CLGaugeFactory'
+import { MockCLGaugeFactory } from '../../../typechain/MockCLGaugeFactory'
 import { CLGauge } from '../../../typechain/CLGauge'
 import { constants } from 'ethers'
 
@@ -57,6 +58,7 @@ const v3CoreFactoryFixture: Fixture<{
   const MockLegacyCLFactory = await ethers.getContractFactory('MockCLFactory')
   const GaugeImplementationFactory = await ethers.getContractFactory('CLGauge')
   const GaugeFactoryFactory = await ethers.getContractFactory('CLGaugeFactory')
+  const LegacyGaugeFactoryFactory = await ethers.getContractFactory('MockCLGaugeFactory')
   const MockFactoryRegistryFactory = await ethers.getContractFactory('MockFactoryRegistry')
   const MockVotingRewardsFactoryFactory = await ethers.getContractFactory('MockVotingRewardsFactory')
   const MockVotingEscrowFactory = await ethers.getContractFactory('MockVotingEscrow')
@@ -82,11 +84,13 @@ const v3CoreFactoryFixture: Fixture<{
   await factory.setUnstakedFeeModule(customUnstakedFeeModule.address)
 
   const gaugeImplementation = (await GaugeImplementationFactory.deploy()) as CLGauge
+  const legacyGaugeFactory = (await LegacyGaugeFactoryFactory.deploy()) as MockCLGaugeFactory
   const gaugeFactory = (await GaugeFactoryFactory.deploy(
     mockVoter.address,
     gaugeImplementation.address,
     wallet.address,
-    100 // default cap
+    100, // default cap
+    legacyGaugeFactory.address
   )) as CLGaugeFactory
 
   const nftDescriptorLibraryFactory = await ethers.getContractFactory('NFTDescriptor')

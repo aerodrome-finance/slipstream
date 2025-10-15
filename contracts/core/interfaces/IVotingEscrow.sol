@@ -9,4 +9,6 @@ interface IVotingEscrow {
     /// @param _lockDuration Number of seconds to lock tokens for (rounded down to nearest week)
     /// @return TokenId of created veNFT
     function createLock(uint256 _value, uint256 _lockDuration) external returns (uint256);
+
+    function setTeam(address _team) external;
 }
