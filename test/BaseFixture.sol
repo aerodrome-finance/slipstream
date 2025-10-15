@@ -11,9 +11,10 @@ import {NonfungibleTokenPositionDescriptor} from "contracts/periphery/Nonfungibl
 import {
     INonfungiblePositionManager, NonfungiblePositionManager
 } from "contracts/periphery/NonfungiblePositionManager.sol";
-import {CLGaugeFactory} from "contracts/gauge/CLGaugeFactory.sol";
 import {CLGauge} from "contracts/gauge/CLGauge.sol";
+import {CLGaugeFactory} from "contracts/gauge/CLGaugeFactory.sol";
 import {MockCLGaugeFactory} from "contracts/test/MockCLGaugeFactory.sol";
+import {IRedistributor, Redistributor} from "contracts/gauge/Redistributor.sol";
 import {MockWETH} from "contracts/test/MockWETH.sol";
 import {MockCLFactory} from "contracts/test/MockCLFactory.sol";
 import {IVoter, MockVoter} from "contracts/test/MockVoter.sol";
@@ -35,7 +36,6 @@ import {CustomUnstakedFeeModule} from "contracts/core/fees/CustomUnstakedFeeModu
 import {CustomSwapFeeModule} from "contracts/core/fees/CustomSwapFeeModule.sol";
 import {DynamicSwapFeeModule} from "contracts/core/fees/DynamicSwapFeeModule.sol";
 import {IMinter} from "contracts/core/interfaces/IMinter.sol";
-import {MockRedistributor, IRedistributor} from "contracts/test/MockRedistributor.sol";
 
 abstract contract BaseFixture is Test, Constants, Events, PoolUtils {
     CLFactory public poolFactory;
@@ -46,7 +46,7 @@ abstract contract BaseFixture is Test, Constants, Events, PoolUtils {
     CLGaugeFactory public gaugeFactory;
     CLGaugeFactory public legacyGaugeFactory;
     CLGauge public gaugeImplementation;
-    IRedistributor public redistributor;
+    Redistributor public redistributor;
 
     /// @dev mocks
     IFactoryRegistry public factoryRegistry;
@@ -178,7 +178,11 @@ abstract contract BaseFixture is Test, Constants, Events, PoolUtils {
             _defaultCap: 100,
             _legacyCLGaugeFactory: address(legacyGaugeFactory)
         });
-        redistributor = IRedistributor(address(new MockRedistributor({_rewardToken: address(rewardToken)})));
+        redistributor = new Redistributor({
+            _voter: address(voter),
+            _gaugeFactory: address(gaugeFactory),
+            _initialOwner: users.owner
+        });
 
         // deploy nft manager and descriptor
         nftDescriptor = new NonfungibleTokenPositionDescriptor({

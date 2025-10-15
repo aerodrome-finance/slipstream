@@ -16,9 +16,15 @@ interface IVoter {
 
     function gauges(address _pool) external view returns (address);
 
+    function poolForGauge(address _gauge) external view returns (address);
+
     function gaugeToFees(address _gauge) external view returns (address);
 
     function gaugeToBribes(address _gauge) external view returns (address);
+
+    function weights(address _pool) external view returns (uint256);
+
+    function isGauge(address _gauge) external view returns (bool);
 
     function createGauge(address _poolFactory, address _pool) external returns (address);
 
@@ -35,6 +41,8 @@ interface IVoter {
     function killGauge(address _gauge) external;
 
     function emergencyCouncil() external view returns (address);
+
+    function totalWeight() external view returns (uint256);
 
     /// @notice Claim emissions from gauges.
     /// @param _gauges Array of gauges to collect emissions from.

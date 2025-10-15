@@ -11,19 +11,19 @@ contract MockMinter is IMinter {
         aero = _aero;
     }
 
-    function activePeriod() external view override returns (uint256) {
+    function activePeriod() external pure override returns (uint256) {
         revert("Not implemented");
     }
 
-    function tailEmissionRate() external view override returns (uint256) {
+    function tailEmissionRate() external pure override returns (uint256) {
         revert("Not implemented");
     }
 
-    function updatePeriod() external override returns (uint256 _period) {
+    function updatePeriod() external pure override returns (uint256) {
         revert("Not implemented");
     }
 
-    function weekly() external view override returns (uint256) {
+    function weekly() external pure override returns (uint256) {
         revert("Not implemented");
     }
 }

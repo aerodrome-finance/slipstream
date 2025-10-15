@@ -49,4 +49,9 @@ abstract contract Events {
     event SetDefaultCap(uint256 indexed _newDefaultCap);
     event SetEmissionCap(address indexed _gauge, uint256 _newEmissionCap);
     event SetRedistributor(address indexed _newRedistributor);
+
+    ///
+    /// Redistributor Events
+    ///
+    event Deposited(address indexed gauge, address indexed to, uint256 amount);
 }

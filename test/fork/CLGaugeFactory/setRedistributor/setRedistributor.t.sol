@@ -26,7 +26,9 @@ contract SetRedistributorIntegrationConcreteTest is CLGaugeFactoryForkTest {
     }
 
     modifier whenRedistributorIsNotZeroAddress() {
-        newRedistributor = address(new MockRedistributor({_rewardToken: address(rewardToken)}));
+        newRedistributor = address(
+            new Redistributor({_voter: address(voter), _gaugeFactory: address(gaugeFactory), _initialOwner: users.owner})
+        );
 
         _;
     }

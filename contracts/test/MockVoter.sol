@@ -41,6 +41,22 @@ contract MockVoter is IVoter {
         minter = _minter;
     }
 
+    function isGauge(address) external pure override returns (bool) {
+        revert("Not implemented");
+    }
+
+    function poolForGauge(address) external pure override returns (address) {
+        revert("Not implemented");
+    }
+
+    function totalWeight() external pure override returns (uint256) {
+        revert("Not implemented");
+    }
+
+    function weights(address) external pure override returns (uint256) {
+        revert("Not implemented");
+    }
+
     function claimFees(address[] memory, address[][] memory, uint256) external override {}
 
     function distribute(address[] memory) external pure override {

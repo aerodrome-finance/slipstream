@@ -10,6 +10,7 @@ import {NonfungibleTokenPositionDescriptor} from "contracts/periphery/Nonfungibl
 import {NonfungiblePositionManager} from "contracts/periphery/NonfungiblePositionManager.sol";
 import {CLGauge} from "contracts/gauge/CLGauge.sol";
 import {CLGaugeFactory} from "contracts/gauge/CLGaugeFactory.sol";
+import {Redistributor} from "contracts/gauge/Redistributor.sol";
 import {CustomSwapFeeModule} from "contracts/core/fees/CustomSwapFeeModule.sol";
 import {CustomUnstakedFeeModule} from "contracts/core/fees/CustomUnstakedFeeModule.sol";
 import {MixedRouteQuoterV1} from "contracts/periphery/lens/MixedRouteQuoterV1.sol";
@@ -34,6 +35,7 @@ contract DeployCL is Script {
     address public feeManager;
     address public notifyAdmin;
     address public emissionAdmin;
+    address public redistributorOwner;
     address public factoryV2;
     address public legacyCLFactory;
     address public legacyCLGaugeFactory;
@@ -47,6 +49,7 @@ contract DeployCL is Script {
     NonfungiblePositionManager public nft;
     CLGauge public gaugeImplementation;
     CLGaugeFactory public gaugeFactory;
+    Redistributor public redistributor;
     CustomSwapFeeModule public swapFeeModule;
     CustomUnstakedFeeModule public unstakedFeeModule;
     MixedRouteQuoterV1 public mixedQuoter;
@@ -67,6 +70,7 @@ contract DeployCL is Script {
         feeManager = abi.decode(vm.parseJson(jsonConstants, ".feeManager"), (address));
         notifyAdmin = abi.decode(vm.parseJson(jsonConstants, ".notifyAdmin"), (address));
         emissionAdmin = abi.decode(vm.parseJson(jsonConstants, ".emissionAdmin"), (address));
+        redistributorOwner = abi.decode(vm.parseJson(jsonConstants, ".redistributorOwner"), (address));
         factoryV2 = abi.decode(vm.parseJson(jsonConstants, ".factoryV2"), (address));
         legacyCLFactory = abi.decode(vm.parseJson(jsonConstants, ".legacyCLFactory"), (address));
         legacyCLGaugeFactory = abi.decode(vm.parseJson(jsonConstants, ".legacyCLGaugeFactory"), (address));
@@ -92,6 +96,13 @@ contract DeployCL is Script {
             _emissionAdmin: emissionAdmin,
             _defaultCap: 100,
             _legacyCLGaugeFactory: legacyCLGaugeFactory
+        });
+
+        // deploy redistributor
+        redistributor = new Redistributor({
+            _voter: address(voter),
+            _gaugeFactory: address(gaugeFactory),
+            _initialOwner: redistributorOwner
         });
 
         // deploy nft contracts

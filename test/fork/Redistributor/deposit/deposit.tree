@@ -1,0 +1,26 @@
+DepositIntegrationConcreteTest
+├── When the caller is not a valid gauge
+│   └── It should revert with {NotGauge}
+└── When the caller is a valid gauge
+    ├── When deposit is called for the first time in the epoch
+    │   ├── When deposit is called before redistributes
+    │   │   ├── It should store the total weight for the epoch
+    │   │   ├── It should reduce the total weight by the gauge's weight
+    │   │   ├── It should flag the gauge as excluded for the epoch
+    │   │   ├── It should pull the emissions from the gauge
+    │   │   └── It should emit a {Deposited} event
+    │   └── When deposit is called during or after redistributes
+    │       ├── It should store the total weight for the epoch
+    │       ├── It should flag the gauge as excluded for the epoch
+    │       ├── It should transfer the emissions from the gauge to the minter
+    │       └── It should emit a {Deposited} event
+    └── When deposit is not called for the first time in the epoch
+        ├── When deposit is called before redistributes_
+        │   ├── It should reduce the total weight by the gauge's weight
+        │   ├── It should flag the gauge as excluded for the epoch
+        │   ├── It should pull the emissions from the gauge
+        │   └── It should emit a {Deposited} event
+        └── When deposit is called during or after redistributes_
+            ├── It should flag the gauge as excluded for the epoch
+            ├── It should transfer the emissions from the gauge to the minter
+            └── It should emit a {Deposited} event
