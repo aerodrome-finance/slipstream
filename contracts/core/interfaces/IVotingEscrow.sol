@@ -2,6 +2,7 @@
 pragma solidity =0.7.6;
 
 interface IVotingEscrow {
+    function artProxy() external returns (address);
     function team() external returns (address);
 
     /// @notice Deposit `_value` tokens for `msg.sender` and lock for `_lockDuration`
@@ -11,4 +12,9 @@ interface IVotingEscrow {
     function createLock(uint256 _value, uint256 _lockDuration) external returns (uint256);
 
     function setTeam(address _team) external;
+
+    function toggleSplit(address _account, bool _bool) external;
+
+    function setArtProxy(address _proxy) external;
+    function canSplit(address _account) external view returns (bool);
 }

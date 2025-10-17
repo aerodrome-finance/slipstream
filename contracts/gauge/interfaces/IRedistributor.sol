@@ -9,6 +9,9 @@ import {IVoter} from "contracts/core/interfaces/IVoter.sol";
  */
 interface IRedistributor {
     event Deposited(address indexed gauge, address indexed to, uint256 amount);
+    event NotifyRewardWithoutClaim(address indexed gauge, uint256 amount);
+    event SetArtProxy(address indexed proxy);
+    event ToggleSplit(address indexed account, bool indexed enabled);
 
     /**
      * @notice Deposits excess emissions into the redistributor
@@ -17,6 +20,33 @@ interface IRedistributor {
      * @dev Assumes this function can only be called once by each gauge per epoch
      */
     function deposit(uint256 _amount) external;
+
+    /**
+     * @notice Notifies the given gauge of rewards without distributing its fees.
+     * @param _gauge The address of the gauge to give rewards to
+     * @param _amount The amount of rewards to give to the gauge
+     * @dev Should pull funds from the caller and call gauge.notifyRewardWithoutClaim
+     * @dev Only callable by the owner
+     */
+    function notifyRewardWithoutClaim(address _gauge, uint256 _amount) external;
+
+    /**
+     * @notice Sets a new ArtProxy in the VotingEscrow
+     * @param _proxy The address to be set as ArtProxy
+     * @dev Calls VotingEscrow.setArtProxy
+     * @dev Only callable by the owner
+     */
+    function setArtProxy(address _proxy) external;
+
+    /**
+     * @notice Toggle split for a specific address in the VotingEscrow
+     * @param _account Address to toggle split permissions
+     * @param _bool True to allow, false to disallow
+     * @dev Toggle split for address(0) to enable or disable for all.
+     * @dev Calls VotingEscrow.toggleSplit
+     * @dev Only callable by the owner
+     */
+    function toggleSplit(address _account, bool _bool) external;
 
     /**
      * @notice The address of the voter contract

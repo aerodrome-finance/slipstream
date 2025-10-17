@@ -1,0 +1,6 @@
+SetArtProxyIntegrationConcreteTest
+├── When the caller is not owner
+│   └── It should revert with {"Ownable: caller is not the owner"}
+└── When the caller is the owner
+    ├── It should set the new art proxy in the voting escrow
+    └── It should emit a {SetArtProxy} event

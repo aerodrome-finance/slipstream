@@ -5,6 +5,7 @@ import {IVotingEscrow} from "contracts/core/interfaces/IVotingEscrow.sol";
 
 contract MockVotingEscrow is IVotingEscrow {
     address public immutable override team;
+    address public override artProxy;
 
     constructor(address _team) {
         team = _team;
@@ -16,5 +17,17 @@ contract MockVotingEscrow is IVotingEscrow {
 
     function setTeam(address) external pure override {
         return;
+    }
+
+    function setArtProxy(address) external pure override {
+        revert("Not implemented");
+    }
+
+    function toggleSplit(address, bool) external pure override {
+        revert("Not implemented");
+    }
+
+    function canSplit(address) external pure override returns (bool) {
+        revert("Not implemented");
     }
 }

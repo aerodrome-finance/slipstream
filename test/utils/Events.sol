@@ -54,4 +54,7 @@ abstract contract Events {
     /// Redistributor Events
     ///
     event Deposited(address indexed gauge, address indexed to, uint256 amount);
+    event NotifyRewardWithoutClaim(address indexed gauge, uint256 amount);
+    event SetArtProxy(address indexed proxy);
+    event ToggleSplit(address indexed account, bool indexed enabled);
 }

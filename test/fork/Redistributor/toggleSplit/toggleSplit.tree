@@ -1,0 +1,6 @@
+ToggleSplitIntegrationConcreteTest
+├── When the caller is not owner
+│   └── It should revert with {"Ownable: caller is not the owner"}
+└── When the caller is the owner
+    ├── It shoult toggle split for the given account with the value in voting escrow
+    └── It should emit a {ToggleSplit} event

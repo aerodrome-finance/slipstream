@@ -1,0 +1,13 @@
+NotifyRewardWithoutClaimIntegrationConcreteTest
+├── When the caller is not owner
+│   └── It should revert with {"Ownable: caller is not the owner"}
+└── When the caller is the owner
+    ├── When the amount is zero
+    │   └── It should revert with {ZeroReward}
+    └── When the amount is not zero 
+        ├── When the gauge is not a valid gauge
+        │   └── It should revert with {NotGauge}
+        └── When the gauge is a valid gauge
+            ├── It should transfer the reward amount from the caller
+            ├── It should notify reward without claim on the gauge with the amount
+            └── It should emit a {NotifyRewardWithoutClaim} event

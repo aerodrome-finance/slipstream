@@ -10,7 +10,9 @@ import {ProtocolTimeLibrary} from "contracts/libraries/ProtocolTimeLibrary.sol";
 
 import {IRedistributor} from "contracts/gauge/interfaces/IRedistributor.sol";
 import {ICLGaugeFactory} from "contracts/gauge/interfaces/ICLGaugeFactory.sol";
+import {ICLGauge} from "contracts/gauge/interfaces/ICLGauge.sol";
 import {IVoter} from "contracts/core/interfaces/IVoter.sol";
+import {IVotingEscrow} from "contracts/core/interfaces/IVotingEscrow.sol";
 
 /// @title Redistributor
 /// @notice Manages the redistribution of excess emissions to Aerodrome gauges
@@ -63,5 +65,31 @@ contract Redistributor is IRedistributor, Ownable, ReentrancyGuard {
             TransferHelper.safeTransferFrom({token: rewardToken, from: msg.sender, to: minter, value: _amount});
             emit Deposited({gauge: msg.sender, to: minter, amount: _amount});
         }
+    }
+
+    /// @inheritdoc IRedistributor
+    function notifyRewardWithoutClaim(address _gauge, uint256 _amount) external override onlyOwner nonReentrant {
+        require(_amount != 0, "ZR");
+        require(voter.isGauge({_gauge: _gauge}), "NG");
+
+        TransferHelper.safeTransferFrom({token: rewardToken, from: msg.sender, to: address(this), value: _amount});
+        TransferHelper.safeApprove({token: rewardToken, to: _gauge, value: _amount});
+        ICLGauge(_gauge).notifyRewardWithoutClaim({amount: _amount});
+
+        emit NotifyRewardWithoutClaim({gauge: _gauge, amount: _amount});
+    }
+
+    /// @inheritdoc IRedistributor
+    function setArtProxy(address _proxy) external override onlyOwner nonReentrant {
+        IVotingEscrow(escrow).setArtProxy({_proxy: _proxy});
+
+        emit SetArtProxy({proxy: _proxy});
+    }
+
+    /// @inheritdoc IRedistributor
+    function toggleSplit(address _account, bool _bool) external override onlyOwner nonReentrant {
+        IVotingEscrow(escrow).toggleSplit({_account: _account, _bool: _bool});
+
+        emit ToggleSplit({account: _account, enabled: _bool});
     }
 }
