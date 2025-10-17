@@ -9,6 +9,7 @@ contract MockCLGaugeFactory {
     }
 
     function setNotifyAdmin(address _admin) external {
+        require(msg.sender == notifyAdmin, "NA");
         notifyAdmin = _admin;
     }
 }

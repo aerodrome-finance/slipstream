@@ -17,7 +17,7 @@ contract NotifyRewardAmountIntegrationConcreteTest is CLGaugeForkTest {
         addresses = vm.readFile(path);
 
         // before tail fork
-        beforeTailFork = vm.createSelectFork({urlOrAlias: "base", blockNumber: 12670000});
+        beforeTailFork = vm.createSelectFork({urlOrAlias: "base", blockNumber: blockNumber});
         _setUp();
 
         // after tail fork

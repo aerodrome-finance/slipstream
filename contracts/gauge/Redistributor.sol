@@ -92,4 +92,13 @@ contract Redistributor is IRedistributor, Ownable, ReentrancyGuard {
 
         emit ToggleSplit({account: _account, enabled: _bool});
     }
+
+    /// @inheritdoc IRedistributor
+    function transferPermissions(address _newRedistributor) external override onlyOwner nonReentrant {
+        require(_newRedistributor != address(0), "ZA");
+        IVotingEscrow(escrow).setTeam({_team: _newRedistributor});
+        ICLGaugeFactory(ICLGaugeFactory(gaugeFactory).legacyCLGaugeFactory()).setNotifyAdmin({_admin: _newRedistributor});
+
+        emit PermissionsTransferred({redistributor: address(this), newRedistributor: _newRedistributor});
+    }
 }

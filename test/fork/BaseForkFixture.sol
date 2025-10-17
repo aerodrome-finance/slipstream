@@ -7,7 +7,7 @@ import "../BaseFixture.sol";
 abstract contract BaseForkFixture is BaseFixture {
     using stdJson for string;
 
-    uint256 public blockNumber = 12670000;
+    uint256 public blockNumber = 13843730;
     string public addresses;
     IERC20 public dai;
 
@@ -41,6 +41,8 @@ abstract contract BaseForkFixture is BaseFixture {
         votingRewardsFactory = IVotingRewardsFactory(vm.parseJsonAddress(addresses, ".VotingRewardsFactory"));
         escrow = IVotingEscrow(vm.parseJsonAddress(addresses, ".VotingEscrow"));
         minter = IMinter(vm.parseJsonAddress(addresses, ".Minter"));
+        legacyPoolFactory = CLFactory(vm.parseJsonAddress(addresses, ".LegacyCLFactory"));
+        legacyGaugeFactory = CLGaugeFactory(vm.parseJsonAddress(addresses, ".LegacyCLGaugeFactory"));
     }
 
     function postDeployment() public virtual override {

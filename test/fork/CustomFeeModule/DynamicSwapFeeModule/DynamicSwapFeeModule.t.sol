@@ -13,7 +13,7 @@ abstract contract DynamicSwapFeeModuleForkTest is BaseForkFixture {
         blockNumber = 26200000;
         super.setUp();
 
-        poolFactory = CLFactory(vm.parseJsonAddress(addresses, ".CLFactory"));
+        poolFactory = CLFactory(vm.parseJsonAddress(addresses, ".LegacyCLFactory"));
 
         dynamicSwapFeeModule = new DynamicSwapFeeModule({
             _factory: address(poolFactory),

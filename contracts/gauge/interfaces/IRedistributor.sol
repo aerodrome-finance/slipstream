@@ -12,6 +12,7 @@ interface IRedistributor {
     event NotifyRewardWithoutClaim(address indexed gauge, uint256 amount);
     event SetArtProxy(address indexed proxy);
     event ToggleSplit(address indexed account, bool indexed enabled);
+    event PermissionsTransferred(address indexed redistributor, address indexed newRedistributor);
 
     /**
      * @notice Deposits excess emissions into the redistributor
@@ -47,6 +48,13 @@ interface IRedistributor {
      * @dev Only callable by the owner
      */
     function toggleSplit(address _account, bool _bool) external;
+
+    /**
+     * @notice Transfers the redistributor permissions (escrow.team and notifyAdmin in legacy gauge factory) to the given address.
+     * @param _newRedistributor The redistributor to which the permissions will be transferred to
+     * @dev only callable by the redistributor owner
+     */
+    function transferPermissions(address _newRedistributor) external;
 
     /**
      * @notice The address of the voter contract

@@ -154,14 +154,6 @@ abstract contract BaseFixture is Test, Constants, Events, PoolUtils {
     function deployContracts() public virtual {
         // deploy pool and associated contracts
         poolImplementation = new CLPool();
-
-        // create mock cl factory
-        address mockFactory = address(new MockCLFactory());
-        legacyPoolFactory = new CLFactory({
-            _voter: address(voter),
-            _clFactory: mockFactory,
-            _poolImplementation: address(poolImplementation)
-        });
         poolFactory = new CLFactory({
             _voter: address(voter),
             _clFactory: address(legacyPoolFactory),
@@ -170,7 +162,6 @@ abstract contract BaseFixture is Test, Constants, Events, PoolUtils {
 
         // deploy gauges and associated contracts
         gaugeImplementation = new CLGauge();
-        legacyGaugeFactory = CLGaugeFactory(address(new MockCLGaugeFactory()));
         gaugeFactory = new CLGaugeFactory({
             _voter: address(voter),
             _implementation: address(gaugeImplementation),
@@ -223,6 +214,12 @@ abstract contract BaseFixture is Test, Constants, Events, PoolUtils {
                 _minter: address(minter)
             })
         );
+
+        address mockFactory = address(new MockCLFactory());
+        legacyPoolFactory =
+            new CLFactory({_voter: address(voter), _clFactory: mockFactory, _poolImplementation: address(new CLPool())});
+
+        legacyGaugeFactory = CLGaugeFactory(address(new MockCLGaugeFactory()));
     }
 
     /// @dev Helper utility to forward time to next week
@@ -260,6 +257,8 @@ abstract contract BaseFixture is Test, Constants, Events, PoolUtils {
         vm.label({account: address(gaugeFactory), newLabel: "Gauge Factory"});
         vm.label({account: address(customSwapFeeModule), newLabel: "Custom Swap FeeModule"});
         vm.label({account: address(customUnstakedFeeModule), newLabel: "Custom Unstaked Fee Module"});
+        vm.label({account: address(legacyPoolFactory), newLabel: "Legacy Pool Factory"});
+        vm.label({account: address(legacyGaugeFactory), newLabel: "Legacy Gauge Factory"});
     }
 
     function createUser(string memory name) internal returns (address payable user) {

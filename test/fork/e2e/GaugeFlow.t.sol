@@ -293,11 +293,11 @@ contract GaugeFlowTest is BaseForkFixture {
         gauges[0] = address(gauge);
         voter.distribute(gauges);
         skip(1);
-        assertEq(rewardToken.balanceOf(address(gauge)), 46539477581261455735);
+        assertEq(rewardToken.balanceOf(address(gauge)), 43557188884126029002);
 
-        checkEmissions(users.alice, tokenIdAlice, 1507737680929034050);
-        checkEmissions(users.bob, tokenIdBob, 507737680929034052);
-        checkEmissions(largeTokenHolder, tokenIdLarge, 984600385901960204);
+        checkEmissions(users.alice, tokenIdAlice, 1507737642548646601);
+        checkEmissions(users.bob, tokenIdBob, 507737642548646603);
+        checkEmissions(largeTokenHolder, tokenIdLarge, 984595502094442182);
         checkFees(users.alice, tokenIdVeAlice, 750000000000000002, 75000000000000000002);
         checkFees(users.bob, tokenIdVeBob, 298499999999999999, 29849999999999999999);
 
@@ -305,10 +305,10 @@ contract GaugeFlowTest is BaseForkFixture {
         doSomeSwaps();
         skipToNextEpoch(1 hours + 1);
         minter.updatePeriod();
-        assertEq(rewardToken.balanceOf(address(gauge)), 45539401833501427425);
+        assertEq(rewardToken.balanceOf(address(gauge)), 42557118096934293612);
         gauges[0] = address(gauge);
         voter.distribute(gauges);
-        assertEq(rewardToken.balanceOf(address(gauge)), 90623484638950269386);
+        assertEq(rewardToken.balanceOf(address(gauge)), 84688735092219062035);
         skip(1);
 
         //large token holder creates lock
@@ -327,15 +327,15 @@ contract GaugeFlowTest is BaseForkFixture {
         doSomeSwaps();
         skipToNextEpoch(1 hours + 1);
         minter.updatePeriod();
-        assertEq(rewardToken.balanceOf(address(gauge)), 90623484638950269386);
+        assertEq(rewardToken.balanceOf(address(gauge)), 84688735092219062035);
         gauges[0] = address(gauge);
         voter.distribute(gauges);
-        assertEq(rewardToken.balanceOf(address(gauge)), 1901398256894893448480481);
+        assertEq(rewardToken.balanceOf(address(gauge)), 1784250446299865083409635);
         skip(1);
 
-        checkEmissions(users.alice, tokenIdAlice, 2233368944037661465);
-        checkEmissions(users.bob, tokenIdBob, 1233368944037661467);
-        checkEmissions(largeTokenHolder, tokenIdLarge, 92334748386745869682);
+        checkEmissions(users.alice, tokenIdAlice, 2185943635014212111);
+        checkEmissions(users.bob, tokenIdBob, 1185943635014212113);
+        checkEmissions(largeTokenHolder, tokenIdLarge, 86300002290993780251);
         checkFees(users.alice, tokenIdVeAlice, 900002985517110672, 90000298551711067029);
         checkFees(users.bob, tokenIdVeBob, 448502985517110669, 44850298551711067026);
         checkFees(largeTokenHolder, tokenIdVeLarge, 299994028965778659, 29999402896577865944);
@@ -344,15 +344,15 @@ contract GaugeFlowTest is BaseForkFixture {
         doSomeSwaps();
         skipToNextEpoch(1 hours + 1);
         minter.updatePeriod();
-        assertEq(rewardToken.balanceOf(address(gauge)), 1901304470883980485355969);
+        assertEq(rewardToken.balanceOf(address(gauge)), 1784162789885589158498364);
         gauges[0] = address(gauge);
         voter.distribute(gauges);
-        assertEq(rewardToken.balanceOf(address(gauge)), 3783599027960132473488758);
+        assertEq(rewardToken.balanceOf(address(gauge)), 3550486889874714303177752);
         skip(1);
 
-        checkEmissions(users.alice, tokenIdAlice, 14712830644710923387872);
-        checkEmissions(users.bob, tokenIdBob, 14711830644710923387874);
-        checkEmissions(largeTokenHolder, tokenIdLarge, 1871978741981844732499469);
+        checkEmissions(users.alice, tokenIdAlice, 13806445428815153937042);
+        checkEmissions(users.bob, tokenIdBob, 13805445428815153937044);
+        checkEmissions(largeTokenHolder, tokenIdLarge, 1756643508919911741619511);
         checkFees(users.alice, tokenIdVeAlice, 900005971034221342, 90000597103422134056);
         checkFees(users.bob, tokenIdVeBob, 448505971034221339, 44850597103422134053);
         checkFees(largeTokenHolder, tokenIdVeLarge, 599988057931557318, 59998805793155731888);

@@ -1,0 +1,16 @@
+TransferPermissionsIntegrationConcreteTest
+├── When the caller is not the owner
+│   └── It should revert with {Ownable: caller is not the owner}
+└── When the caller is the owner
+    ├── When the new redistributor is the zero address
+    │   └── It should revert with {ZeroAddress}
+    └── When the new redistributor is not the zero address
+        ├── When the redistributor is not escrow team
+        │   └── It should revert with {NotTeam}
+        └── When the redistributor is escrow team
+            ├── When the redistributor is not the legacy gauge factory notify admin 
+            │   └── It should revert with {NotAuthorized}
+            └── When the redistributor is the legacy gauge factory notify admin
+                ├── It should set the new redistributor as the escrow team 
+                ├── It should set the new redistributor as the legacy gauge factory notify admin 
+                └── It should emit a {PermissionsTransferred} event

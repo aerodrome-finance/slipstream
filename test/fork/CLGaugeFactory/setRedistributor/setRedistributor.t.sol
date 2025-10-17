@@ -68,7 +68,7 @@ contract SetRedistributorIntegrationConcreteTest is CLGaugeFactoryForkTest {
     {
         // It should set the new redistributor
         // It should emit a {SetRedistributor} event
-        vm.startPrank(gaugeFactory.notifyAdmin());
+        vm.startPrank(legacyGaugeFactory.notifyAdmin());
         legacyGaugeFactory.setNotifyAdmin({_admin: newRedistributor});
         vm.stopPrank();
 
