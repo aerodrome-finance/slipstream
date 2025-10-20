@@ -33,6 +33,8 @@ contract Redistributor is IRedistributor, Ownable, ReentrancyGuard {
     /// @inheritdoc IRedistributor
     address public override upkeepManager;
     /// @inheritdoc IRedistributor
+    address public override keeper;
+    /// @inheritdoc IRedistributor
     uint256 public override activePeriod;
 
     /// @inheritdoc IRedistributor
@@ -55,9 +57,9 @@ contract Redistributor is IRedistributor, Ownable, ReentrancyGuard {
         transferOwnership({newOwner: _initialOwner});
     }
 
-    modifier onlyUpkeepOrOwner() {
+    modifier onlyUpkeepOrKeeper() {
         if (!IUpkeepManager(upkeepManager).isUpkeep({_account: msg.sender})) {
-            require(msg.sender == owner(), "NA");
+            require(msg.sender == keeper, "NA");
         }
         _;
     }
@@ -85,7 +87,7 @@ contract Redistributor is IRedistributor, Ownable, ReentrancyGuard {
     }
 
     /// @inheritdoc IRedistributor
-    function redistribute(address[] memory _gauges) external override onlyUpkeepOrOwner nonReentrant {
+    function redistribute(address[] memory _gauges) external override onlyUpkeepOrKeeper nonReentrant {
         uint256 epochStart = ProtocolTimeLibrary.epochStart({timestamp: block.timestamp});
         require(block.timestamp >= epochStart + 10 minutes, "TS");
 
@@ -111,7 +113,7 @@ contract Redistributor is IRedistributor, Ownable, ReentrancyGuard {
     }
 
     /// @inheritdoc IRedistributor
-    function redistribute(uint256 _start, uint256 _end) external override onlyUpkeepOrOwner nonReentrant {
+    function redistribute(uint256 _start, uint256 _end) external override onlyUpkeepOrKeeper nonReentrant {
         uint256 epochStart = ProtocolTimeLibrary.epochStart({timestamp: block.timestamp});
         require(block.timestamp >= epochStart + 10 minutes, "TS");
 
@@ -154,6 +156,14 @@ contract Redistributor is IRedistributor, Ownable, ReentrancyGuard {
         upkeepManager = _upkeepManager;
 
         emit SetUpkeepManager({upkeepManager: _upkeepManager});
+    }
+
+    /// @inheritdoc IRedistributor
+    function setKeeper(address _keeper) external override onlyOwner nonReentrant {
+        require(_keeper != address(0), "ZA");
+        keeper = _keeper;
+
+        emit SetKeeper({keeper: _keeper});
     }
 
     /// @inheritdoc IRedistributor

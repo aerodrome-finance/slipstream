@@ -1,7 +1,7 @@
 RedistributeIntegrationConcreteTest
-├── When the caller is not a gauge upkeep or the owner
+├── When the caller is not a gauge upkeep or the keeper
 │   └── It should revert with {NotAuthorized}
-└── When the caller is a gauge upkeep or the owner
+└── When the caller is a gauge upkeep or the keeper
     ├── When called during the first 10 minutes of the epoch
     │   └── It should revert with {TooSoon}
     └── When called after the first 10 minutes of the epoch

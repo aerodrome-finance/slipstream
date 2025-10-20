@@ -17,7 +17,7 @@ contract RedistributeArrayBatchIntegrationConcreteTest is RedistributorForkTest 
     function setUp() public virtual override {
         super.setUp();
 
-        /// @dev Set alice as an authorized keeper
+        /// @dev Set alice as an authorized upkeep
         MockUpkeepManager(address(upkeepManager)).setUpkeep({_upkeep: users.alice, _state: true});
         v2Gauge = 0x4F09bAb2f0E15e2A078A227FE1537665F55b8360; // USDC/AERO gauge
         legacyCLGauge = 0xF33a96b5932D9E9B9A0eDA447AbD8C9d48d2e0c8; // WETH/USDC legacy gauge
@@ -63,7 +63,7 @@ contract RedistributeArrayBatchIntegrationConcreteTest is RedistributorForkTest 
         skip(10 minutes);
     }
 
-    function test_WhenTheCallerIsNotAGaugeUpkeepOrTheOwner() external {
+    function test_WhenTheCallerIsNotAGaugeUpkeepOrTheKeeper() external {
         // It should revert with {NotAuthorized}
         address[] memory gauges = new address[](0);
 
@@ -72,16 +72,22 @@ contract RedistributeArrayBatchIntegrationConcreteTest is RedistributorForkTest 
         redistributor.redistribute({_gauges: gauges});
     }
 
-    modifier whenTheCallerIsAGaugeUpkeepOrTheOwner() {
+    modifier whenTheCallerIsAGaugeUpkeepOrTheKeeper() {
+        vm.prank(users.owner);
+        redistributor.setKeeper({_keeper: users.bob});
         vm.startPrank(users.alice);
         _;
     }
 
-    function test_WhenCalledDuringTheFirst10MinutesOfTheEpoch() external whenTheCallerIsAGaugeUpkeepOrTheOwner {
+    function test_WhenCalledDuringTheFirst10MinutesOfTheEpoch() external whenTheCallerIsAGaugeUpkeepOrTheKeeper {
         // It should revert with {TooSoon}
         assertLt(block.timestamp, epochStart + 10 minutes);
         address[] memory gauges = new address[](0);
 
+        vm.expectRevert(bytes("TS"));
+        redistributor.redistribute({_gauges: gauges});
+
+        vm.startPrank(users.bob);
         vm.expectRevert(bytes("TS"));
         redistributor.redistribute({_gauges: gauges});
     }
@@ -93,7 +99,7 @@ contract RedistributeArrayBatchIntegrationConcreteTest is RedistributorForkTest 
 
     function test_WhenThereAreNoEmissionsToRedistribute()
         external
-        whenTheCallerIsAGaugeUpkeepOrTheOwner
+        whenTheCallerIsAGaugeUpkeepOrTheKeeper
         whenCalledAfterTheFirst10MinutesOfTheEpoch
     {
         // It should update the active period
@@ -123,7 +129,7 @@ contract RedistributeArrayBatchIntegrationConcreteTest is RedistributorForkTest 
 
     function test_WhenOneOfTheAddressesInTheArrayIsNotAGauge()
         external
-        whenTheCallerIsAGaugeUpkeepOrTheOwner
+        whenTheCallerIsAGaugeUpkeepOrTheKeeper
         whenCalledAfterTheFirst10MinutesOfTheEpoch
         whenThereAreEmissionsToRedistribute
     {
@@ -145,7 +151,7 @@ contract RedistributeArrayBatchIntegrationConcreteTest is RedistributorForkTest 
 
     function test_WhenAllGaugesAreSkipped()
         external
-        whenTheCallerIsAGaugeUpkeepOrTheOwner
+        whenTheCallerIsAGaugeUpkeepOrTheKeeper
         whenCalledAfterTheFirst10MinutesOfTheEpoch
         whenAllAddressesInTheArrayAreValidGauges
         whenThereAreEmissionsToRedistribute
@@ -195,7 +201,7 @@ contract RedistributeArrayBatchIntegrationConcreteTest is RedistributorForkTest 
 
     function test_WhenSomeGaugesReceiveRedistributes()
         external
-        whenTheCallerIsAGaugeUpkeepOrTheOwner
+        whenTheCallerIsAGaugeUpkeepOrTheKeeper
         whenCalledAfterTheFirst10MinutesOfTheEpoch
         whenAllAddressesInTheArrayAreValidGauges
         whenThereAreEmissionsToRedistribute
@@ -288,7 +294,7 @@ contract RedistributeArrayBatchIntegrationConcreteTest is RedistributorForkTest 
 
     function test_WhenAllGaugesReceiveRedistributes()
         external
-        whenTheCallerIsAGaugeUpkeepOrTheOwner
+        whenTheCallerIsAGaugeUpkeepOrTheKeeper
         whenCalledAfterTheFirst10MinutesOfTheEpoch
         whenAllAddressesInTheArrayAreValidGauges
         whenThereAreEmissionsToRedistribute

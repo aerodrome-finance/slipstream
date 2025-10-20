@@ -1,0 +1,9 @@
+SetKeeperIntegrationConcreteTest
+├── When the caller is not owner
+│   └── It should revert with {"Ownable: caller is not the owner"}
+└── When the caller is the owner
+    ├── When the keeper is zero address
+    │   └── It should revert with {ZeroAddress}
+    └── When the keeper is not zero address
+        ├── It should set the new keeper
+        └── It should emit a {SetKeeper} event

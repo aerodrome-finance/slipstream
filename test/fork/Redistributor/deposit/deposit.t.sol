@@ -21,8 +21,10 @@ contract DepositIntegrationConcreteTest is RedistributorForkTest {
     }
 
     modifier whenTheCallerIsAValidGauge() {
-        deal(address(rewardToken), address(gauge), amount);
+        vm.prank(users.owner);
+        redistributor.setKeeper({_keeper: users.bob});
 
+        deal(address(rewardToken), address(gauge), amount);
         vm.startPrank(address(gauge));
         rewardToken.approve(address(redistributor), amount);
         _;
@@ -69,7 +71,7 @@ contract DepositIntegrationConcreteTest is RedistributorForkTest {
 
         deal(address(rewardToken), address(redistributor), amount);
 
-        vm.startPrank(users.owner);
+        vm.startPrank(users.bob);
         address[] memory gauges = new address[](1);
         gauges[0] = address(gauge);
         redistributor.redistribute({_gauges: gauges});
@@ -140,7 +142,7 @@ contract DepositIntegrationConcreteTest is RedistributorForkTest {
 
         assertEq(redistributor.totalWeight(epochStart), totalWeight - gaugeWeight2);
 
-        vm.startPrank(users.owner);
+        vm.startPrank(users.bob);
         address[] memory gauges = new address[](1);
         gauges[0] = address(gauge);
         redistributor.redistribute({_gauges: gauges});

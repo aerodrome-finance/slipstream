@@ -21,7 +21,7 @@ contract RedistributeIndexBatchIntegrationConcreteTest is RedistributorForkTest 
     function setUp() public virtual override {
         super.setUp();
 
-        /// @dev Set alice as an authorized keeper
+        /// @dev Set alice as an authorized upkeep
         MockUpkeepManager(address(upkeepManager)).setUpkeep({_upkeep: users.alice, _state: true});
         uint256 length = voter.length();
 
@@ -81,22 +81,28 @@ contract RedistributeIndexBatchIntegrationConcreteTest is RedistributorForkTest 
         skip(10 minutes);
     }
 
-    function test_WhenTheCallerIsNotAGaugeUpkeepOrTheOwner() external {
+    function test_WhenTheCallerIsNotAGaugeUpkeepOrTheKeeper() external {
         // It should revert with {NotAuthorized}
         vm.prank(users.charlie);
         vm.expectRevert(bytes("NA"));
         redistributor.redistribute({_start: startIndex, _end: endIndex});
     }
 
-    modifier whenTheCallerIsAGaugeUpkeepOrTheOwner() {
+    modifier whenTheCallerIsAGaugeUpkeepOrTheKeeper() {
+        vm.prank(users.owner);
+        redistributor.setKeeper({_keeper: users.bob});
         vm.startPrank(users.alice);
         _;
     }
 
-    function test_WhenCalledDuringTheFirst10MinutesOfTheEpoch() external whenTheCallerIsAGaugeUpkeepOrTheOwner {
+    function test_WhenCalledDuringTheFirst10MinutesOfTheEpoch() external whenTheCallerIsAGaugeUpkeepOrTheKeeper {
         // It should revert with {TooSoon}
         assertLt(block.timestamp, epochStart + 10 minutes);
 
+        vm.expectRevert(bytes("TS"));
+        redistributor.redistribute({_start: startIndex, _end: endIndex});
+
+        vm.startPrank(users.bob);
         vm.expectRevert(bytes("TS"));
         redistributor.redistribute({_start: startIndex, _end: endIndex});
     }
@@ -108,7 +114,7 @@ contract RedistributeIndexBatchIntegrationConcreteTest is RedistributorForkTest 
 
     function test_WhenThereAreNoEmissionsToRedistribute()
         external
-        whenTheCallerIsAGaugeUpkeepOrTheOwner
+        whenTheCallerIsAGaugeUpkeepOrTheKeeper
         whenCalledAfterTheFirst10MinutesOfTheEpoch
     {
         // It should update the active period
@@ -138,7 +144,7 @@ contract RedistributeIndexBatchIntegrationConcreteTest is RedistributorForkTest 
 
     function test_WhenAllGaugesAreSkipped()
         external
-        whenTheCallerIsAGaugeUpkeepOrTheOwner
+        whenTheCallerIsAGaugeUpkeepOrTheKeeper
         whenCalledAfterTheFirst10MinutesOfTheEpoch
         whenThereAreEmissionsToRedistribute
     {
@@ -184,7 +190,7 @@ contract RedistributeIndexBatchIntegrationConcreteTest is RedistributorForkTest 
 
     function test_WhenSomeGaugesReceiveRedistributes()
         external
-        whenTheCallerIsAGaugeUpkeepOrTheOwner
+        whenTheCallerIsAGaugeUpkeepOrTheKeeper
         whenCalledAfterTheFirst10MinutesOfTheEpoch
         whenThereAreEmissionsToRedistribute
     {
@@ -276,7 +282,7 @@ contract RedistributeIndexBatchIntegrationConcreteTest is RedistributorForkTest 
 
     function test_WhenAllGaugesReceiveRedistributes()
         external
-        whenTheCallerIsAGaugeUpkeepOrTheOwner
+        whenTheCallerIsAGaugeUpkeepOrTheKeeper
         whenCalledAfterTheFirst10MinutesOfTheEpoch
         whenThereAreEmissionsToRedistribute
     {

@@ -15,6 +15,7 @@ interface IRedistributor {
     event ToggleSplit(address indexed account, bool indexed enabled);
     event PermissionsTransferred(address indexed redistributor, address indexed newRedistributor);
     event SetUpkeepManager(address indexed upkeepManager);
+    event SetKeeper(address indexed keeper);
 
     /**
      * @notice Deposits excess emissions into the redistributor
@@ -54,6 +55,13 @@ interface IRedistributor {
      * @dev Only callable by the owner
      */
     function setUpkeepManager(address _upkeepManager) external;
+
+    /**
+     * @notice Sets the keeper address
+     * @param _keeper The address to be set as keeper
+     * @dev Only callable by the owner
+     */
+    function setKeeper(address _keeper) external;
 
     /**
      * @notice Sets a new ArtProxy in the VotingEscrow
@@ -115,6 +123,12 @@ interface IRedistributor {
      * @return Address of the upkeep manager
      */
     function upkeepManager() external view returns (address);
+
+    /**
+     * @notice The address of the keeper
+     * @return Address of the keeper
+     */
+    function keeper() external view returns (address);
 
     /**
      * @notice Timestamp of start of epoch that `redistribute()` was last called in

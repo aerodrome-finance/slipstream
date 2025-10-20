@@ -125,6 +125,9 @@ contract RedistributeFlowTest is BaseForkFixture {
 
         voter.vote(tokenIdVe, pools, weights);
         vm.stopPrank();
+
+        vm.prank(users.owner);
+        redistributor.setKeeper({_keeper: users.bob});
     }
 
     function createStakedLper(
@@ -258,7 +261,7 @@ contract RedistributeFlowTest is BaseForkFixture {
         balanceGauge3 = rewardToken.balanceOf(address(gauge3));
 
         skip(10 minutes);
-        vm.prank(users.owner);
+        vm.prank(users.bob);
         redistributor.redistribute(gauges);
 
         assertLe(rewardToken.balanceOf(address(redistributor)), 1);
@@ -327,7 +330,7 @@ contract RedistributeFlowTest is BaseForkFixture {
         balanceGauge3 = rewardToken.balanceOf(address(gauge3));
 
         skip(10 minutes);
-        vm.prank(users.owner);
+        vm.prank(users.bob);
         redistributor.redistribute(gauges);
 
         // Redistributor should be empty
