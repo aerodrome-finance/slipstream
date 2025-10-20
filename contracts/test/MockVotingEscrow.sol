@@ -15,6 +15,10 @@ contract MockVotingEscrow is IVotingEscrow {
         return 0;
     }
 
+    function lockPermanent(uint256) external pure override {
+        revert("Not implemented");
+    }
+
     function setTeam(address) external pure override {
         return;
     }

@@ -16,6 +16,10 @@ interface IVoter {
 
     function gauges(address _pool) external view returns (address);
 
+    function pools(uint256 _index) external view returns (address);
+
+    function length() external view returns (uint256);
+
     function poolForGauge(address _gauge) external view returns (address);
 
     function gaugeToFees(address _gauge) external view returns (address);

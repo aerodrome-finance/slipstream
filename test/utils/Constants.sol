@@ -27,6 +27,7 @@ abstract contract Constants {
     address public constant forwarder = address(11);
 
     uint256 constant WEEK = 1 weeks;
+    uint256 constant MAX_BPS = 10_000;
 
     uint256 internal constant Q128 = 0x100000000000000000000000000000000;
     uint256 internal constant Q96 = 0x1000000000000000000000000;

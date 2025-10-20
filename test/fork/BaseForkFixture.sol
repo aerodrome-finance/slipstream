@@ -43,6 +43,7 @@ abstract contract BaseForkFixture is BaseFixture {
         minter = IMinter(vm.parseJsonAddress(addresses, ".Minter"));
         legacyPoolFactory = CLFactory(vm.parseJsonAddress(addresses, ".LegacyCLFactory"));
         legacyGaugeFactory = CLGaugeFactory(vm.parseJsonAddress(addresses, ".LegacyCLGaugeFactory"));
+        upkeepManager = new MockUpkeepManager();
     }
 
     function postDeployment() public virtual override {

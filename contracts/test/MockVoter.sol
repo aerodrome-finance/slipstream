@@ -57,6 +57,14 @@ contract MockVoter is IVoter {
         revert("Not implemented");
     }
 
+    function pools(uint256) external pure override returns (address) {
+        revert("Not implemented");
+    }
+
+    function length() external pure override returns (uint256) {
+        revert("Not implemented");
+    }
+
     function claimFees(address[] memory, address[][] memory, uint256) external override {}
 
     function distribute(address[] memory) external pure override {

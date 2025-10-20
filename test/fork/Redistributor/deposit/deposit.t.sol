@@ -5,8 +5,6 @@ pragma abicoder v2;
 import "../Redistributor.t.sol";
 
 contract DepositIntegrationConcreteTest is RedistributorForkTest {
-    using stdStorage for StdStorage;
-
     uint256 public constant amount = TOKEN_1 * 1_000;
 
     function setUp() public virtual override {
@@ -69,13 +67,15 @@ contract DepositIntegrationConcreteTest is RedistributorForkTest {
         uint256 epochStart = ProtocolTimeLibrary.epochStart(block.timestamp);
         uint256 oldMinterBal = rewardToken.balanceOf(address(minter));
 
-        /// @dev Set `totalEmissions` to simulate that redistribution has started
         deal(address(rewardToken), address(redistributor), amount);
-        stdstore.target({_target: address(redistributor)}).sig({_sig: IRedistributor.totalEmissions.selector}).with_key({
-            amt: uint256(epochStart)
-        }).checked_write({amt: uint256(amount)});
+
+        vm.startPrank(users.owner);
+        address[] memory gauges = new address[](1);
+        gauges[0] = address(gauge);
+        redistributor.redistribute({_gauges: gauges});
         assertEq(redistributor.totalEmissions(epochStart), amount);
 
+        vm.startPrank(address(gauge));
         vm.expectEmit(address(redistributor));
         emit Deposited({gauge: address(gauge), to: address(minter), amount: amount});
         redistributor.deposit({_amount: amount});
@@ -140,13 +140,13 @@ contract DepositIntegrationConcreteTest is RedistributorForkTest {
 
         assertEq(redistributor.totalWeight(epochStart), totalWeight - gaugeWeight2);
 
-        /// @dev Set `totalEmissions` to simulate that redistribution has started
-        deal(address(rewardToken), address(redistributor), amount);
-        stdstore.target({_target: address(redistributor)}).sig({_sig: IRedistributor.totalEmissions.selector}).with_key({
-            amt: uint256(epochStart)
-        }).checked_write({amt: uint256(amount)});
+        vm.startPrank(users.owner);
+        address[] memory gauges = new address[](1);
+        gauges[0] = address(gauge);
+        redistributor.redistribute({_gauges: gauges});
         assertEq(redistributor.totalEmissions(epochStart), amount);
 
+        vm.startPrank(address(gauge));
         vm.expectEmit(address(redistributor));
         emit Deposited({gauge: address(gauge), to: address(minter), amount: amount});
         redistributor.deposit({_amount: amount});

@@ -6,8 +6,10 @@ import "../BaseForkFixture.sol";
 abstract contract RedistributorForkTest is BaseForkFixture {
     CLPool public pool;
     CLPool public pool2;
+    CLPool public pool3;
     CLGauge public gauge;
     CLGauge public gauge2;
+    CLGauge public gauge3;
 
     function setUp() public virtual override {
         blockNumber = 36574920;
@@ -29,10 +31,19 @@ abstract contract RedistributorForkTest is BaseForkFixture {
                 sqrtPriceX96: encodePriceSqrt(1, 1)
             })
         );
+        pool3 = CLPool(
+            poolFactory.createPool({
+                tokenA: address(token0),
+                tokenB: address(token1),
+                tickSpacing: TICK_SPACING_10,
+                sqrtPriceX96: encodePriceSqrt(1, 1)
+            })
+        );
 
         vm.startPrank(voter.governor());
         gauge = CLGauge(payable(voter.createGauge({_poolFactory: address(poolFactory), _pool: address(pool)})));
         gauge2 = CLGauge(payable(voter.createGauge({_poolFactory: address(poolFactory), _pool: address(pool2)})));
+        gauge3 = CLGauge(payable(voter.createGauge({_poolFactory: address(poolFactory), _pool: address(pool3)})));
         vm.stopPrank();
     }
 
@@ -43,5 +54,6 @@ abstract contract RedistributorForkTest is BaseForkFixture {
         assertEq(redistributor.escrow(), address(escrow));
         assertEq(redistributor.gaugeFactory(), address(gaugeFactory));
         assertEq(redistributor.rewardToken(), address(rewardToken));
+        assertEq(redistributor.upkeepManager(), address(upkeepManager));
     }
 }

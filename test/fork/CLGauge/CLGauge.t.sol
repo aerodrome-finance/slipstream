@@ -4,7 +4,6 @@ pragma abicoder v2;
 import "../BaseForkFixture.sol";
 
 abstract contract CLGaugeForkTest is BaseForkFixture {
-    uint256 public MAX_BPS = 10_000;
     CLPool public pool;
     CLGauge public gauge;
 

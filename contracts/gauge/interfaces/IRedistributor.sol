@@ -8,6 +8,7 @@ import {IVoter} from "contracts/core/interfaces/IVoter.sol";
  * @notice Interface of emissions redistributor
  */
 interface IRedistributor {
+    event Redistributed(address indexed sender, address indexed gauge, uint256 amount);
     event Deposited(address indexed gauge, address indexed to, uint256 amount);
     event NotifyRewardWithoutClaim(address indexed gauge, uint256 amount);
     event SetArtProxy(address indexed proxy);
@@ -21,6 +22,21 @@ interface IRedistributor {
      * @dev Assumes this function can only be called once by each gauge per epoch
      */
     function deposit(uint256 _amount) external;
+
+    /**
+     * @notice Redistributes the emissions to the given gauges according to their voting weight
+     * @param _gauges The array of gauge addresses to redistribute emissions to
+     * @dev Only callable by keepers registered in the UpkeepManager or the owner
+     */
+    function redistribute(address[] memory _gauges) external;
+
+    /**
+     * @notice Redistributes the emissions to the gauges in the given index range according to their voting weight
+     * @param _start The index of the first pool whose gauge emissions will be distributed to (inclusive)
+     * @param _end The index of the last gauge's pool (exclusive)
+     * @dev Only callable by keepers registered in the UpkeepManager or the owner
+     */
+    function redistribute(uint256 _start, uint256 _end) external;
 
     /**
      * @notice Notifies the given gauge of rewards without distributing its fees.
@@ -87,6 +103,18 @@ interface IRedistributor {
     function rewardToken() external view returns (address);
 
     /**
+     * @notice The address of the upkeep manager used to register and validate authorized automation upkeeps
+     * @return Address of the upkeep manager
+     */
+    function upkeepManager() external view returns (address);
+
+    /**
+     * @notice Timestamp of start of epoch that `redistribute()` was last called in
+     * @return The epoch start timestamp of the last redistribution
+     */
+    function activePeriod() external view returns (uint256);
+
+    /**
      * @notice The total voting weight for a given epoch
      * @param _epochStart The start of the epoch to fetch the voting weight for
      * @return The total voting weight for the epoch
@@ -107,4 +135,12 @@ interface IRedistributor {
      * @return Whether the gauge is excluded for redistributes in the given epoch
      */
     function isExcluded(uint256 _epochStart, address _gauge) external view returns (bool);
+
+    /**
+     * @notice Checks if a gauge received its redistribute in the given epoch
+     * @param _epochStart The start of the epoch to check
+     * @param _gauge The address of the gauge to check for redistribution
+     * @return Whether the gauge received its redistribute in the given epoch
+     */
+    function isRedistributed(uint256 _epochStart, address _gauge) external view returns (bool);
 }

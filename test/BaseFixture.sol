@@ -11,9 +11,10 @@ import {NonfungibleTokenPositionDescriptor} from "contracts/periphery/Nonfungibl
 import {
     INonfungiblePositionManager, NonfungiblePositionManager
 } from "contracts/periphery/NonfungiblePositionManager.sol";
-import {CLGauge} from "contracts/gauge/CLGauge.sol";
+import {ICLGauge, CLGauge} from "contracts/gauge/CLGauge.sol";
 import {CLGaugeFactory} from "contracts/gauge/CLGaugeFactory.sol";
 import {MockCLGaugeFactory} from "contracts/test/MockCLGaugeFactory.sol";
+import {IUpkeepManager, MockUpkeepManager} from "contracts/test/MockUpkeepManager.sol";
 import {IRedistributor, Redistributor} from "contracts/gauge/Redistributor.sol";
 import {MockWETH} from "contracts/test/MockWETH.sol";
 import {MockCLFactory} from "contracts/test/MockCLFactory.sol";
@@ -55,6 +56,7 @@ abstract contract BaseFixture is Test, Constants, Events, PoolUtils {
     IMinter public minter;
     IERC20 public weth;
     IVotingRewardsFactory public votingRewardsFactory;
+    IUpkeepManager public upkeepManager;
 
     ERC20 public rewardToken;
 
@@ -172,6 +174,7 @@ abstract contract BaseFixture is Test, Constants, Events, PoolUtils {
         redistributor = new Redistributor({
             _voter: address(voter),
             _gaugeFactory: address(gaugeFactory),
+            _upkeepManager: address(upkeepManager),
             _initialOwner: users.owner
         });
 
@@ -220,6 +223,7 @@ abstract contract BaseFixture is Test, Constants, Events, PoolUtils {
             new CLFactory({_voter: address(voter), _clFactory: mockFactory, _poolImplementation: address(new CLPool())});
 
         legacyGaugeFactory = CLGaugeFactory(address(new MockCLGaugeFactory()));
+        upkeepManager = new MockUpkeepManager();
     }
 
     /// @dev Helper utility to forward time to next week

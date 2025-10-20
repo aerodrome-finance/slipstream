@@ -40,7 +40,12 @@ contract TransferPermissionsIntegrationConcreteTest is RedistributorForkTest {
 
     modifier whenTheNewRedistributorIsNotTheZeroAddress() {
         newRedistributor = address(
-            new Redistributor({_voter: address(voter), _gaugeFactory: address(gaugeFactory), _initialOwner: users.owner})
+            new Redistributor({
+                _voter: address(voter),
+                _gaugeFactory: address(gaugeFactory),
+                _upkeepManager: address(upkeepManager),
+                _initialOwner: users.owner
+            })
         );
         _;
     }

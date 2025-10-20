@@ -38,6 +38,8 @@ contract DeployCLForkTest is Test {
     address public factoryRegistry;
     address public poolFactoryOwner;
     address public legacyCLFactory;
+    address public legacyCLGaugeFactory;
+    address public upkeepManager;
     address public feeManager;
     address public notifyAdmin;
     address public emissionAdmin;
@@ -71,6 +73,8 @@ contract DeployCLForkTest is Test {
         factoryRegistry = abi.decode(vm.parseJson(jsonConstants, ".FactoryRegistry"), (address));
         poolFactoryOwner = abi.decode(vm.parseJson(jsonConstants, ".poolFactoryOwner"), (address));
         legacyCLFactory = abi.decode(vm.parseJson(jsonConstants, ".legacyCLFactory"), (address));
+        legacyCLGaugeFactory = abi.decode(vm.parseJson(jsonConstants, ".legacyCLGaugeFactory"), (address));
+        upkeepManager = abi.decode(vm.parseJson(jsonConstants, ".upkeepManager"), (address));
         feeManager = abi.decode(vm.parseJson(jsonConstants, ".feeManager"), (address));
         notifyAdmin = abi.decode(vm.parseJson(jsonConstants, ".notifyAdmin"), (address));
         emissionAdmin = abi.decode(vm.parseJson(jsonConstants, ".emissionAdmin"), (address));
@@ -134,6 +138,7 @@ contract DeployCLForkTest is Test {
         assertEq(gaugeFactory.minter(), minter);
         assertEq(gaugeFactory.rewardToken(), rewardToken);
         assertEq(gaugeFactory.implementation(), address(gaugeImplementation));
+        assertEq(address(gaugeFactory.legacyCLGaugeFactory()), legacyCLGaugeFactory);
         assertEq(gaugeFactory.nft(), address(nft));
         assertEq(gaugeFactory.notifyAdmin(), notifyAdmin);
         assertEq(gaugeFactory.emissionAdmin(), emissionAdmin);
@@ -144,6 +149,7 @@ contract DeployCLForkTest is Test {
         assertEq(redistributor.escrow(), escrow);
         assertEq(redistributor.gaugeFactory(), address(gaugeFactory));
         assertEq(redistributor.rewardToken(), rewardToken);
+        assertEq(redistributor.upkeepManager(), upkeepManager);
 
         assertTrue(address(swapFeeModule) != address(0));
         assertEq(swapFeeModule.MAX_FEE(), 30_000); // 3%, using pip denomination

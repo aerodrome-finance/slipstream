@@ -39,6 +39,7 @@ contract DeployCL is Script {
     address public factoryV2;
     address public legacyCLFactory;
     address public legacyCLGaugeFactory;
+    address public upkeepManager;
     string public nftName;
     string public nftSymbol;
 
@@ -74,6 +75,7 @@ contract DeployCL is Script {
         factoryV2 = abi.decode(vm.parseJson(jsonConstants, ".factoryV2"), (address));
         legacyCLFactory = abi.decode(vm.parseJson(jsonConstants, ".legacyCLFactory"), (address));
         legacyCLGaugeFactory = abi.decode(vm.parseJson(jsonConstants, ".legacyCLGaugeFactory"), (address));
+        upkeepManager = abi.decode(vm.parseJson(jsonConstants, ".upkeepManager"), (address));
         nftName = abi.decode(vm.parseJson(jsonConstants, ".nftName"), (string));
         nftSymbol = abi.decode(vm.parseJson(jsonConstants, ".nftSymbol"), (string));
 
@@ -102,6 +104,7 @@ contract DeployCL is Script {
         redistributor = new Redistributor({
             _voter: address(voter),
             _gaugeFactory: address(gaugeFactory),
+            _upkeepManager: upkeepManager,
             _initialOwner: redistributorOwner
         });
 

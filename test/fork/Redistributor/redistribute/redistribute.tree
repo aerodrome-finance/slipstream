@@ -1,0 +1,80 @@
+RedistributeIntegrationConcreteTest
+├── When the caller is not a gauge upkeep or the owner
+│   └── It should revert with {NotAuthorized}
+└── When the caller is a gauge upkeep or the owner
+    ├── When called during the first 10 minutes of the epoch
+    │   └── It should revert with {TooSoon}
+    └── When called after the first 10 minutes of the epoch
+        ├── When there are no emissions to redistribute
+        │   ├── It should update the active period
+        │   └── It should skip the redistribution
+        └── When there are emissions to redistribute
+            ├── When the gauge is excluded for the epoch
+            │   ├── It should update the total emissions for the epoch
+            │   ├── It should update the active period
+            │   └── It should skip the gauge
+            └── When the gauge is not excluded for the epoch
+                ├── When the gauge has already been redistributed to
+                │   └── It should skip the gauge
+                └── When the gauge has not been redistributed to
+                    ├── When there are no emissions to redistribute to the gauge
+                    │   ├── It should signal the gauge received its redistribute this epoch
+                    │   ├── It should update the total emissions for the epoch
+                    │   └── It should update the active period
+                    └── When there are emissions to redistribute to the gauge
+                        ├── When the gauge is killed
+                        │   ├── It should signal the gauge received its redistribute this epoch
+                        │   ├── It should update the total emissions for the epoch
+                        │   ├── It should update the active period
+                        │   └── It should forward the emissions to the minter
+                        └── When the gauge is alive
+                            ├── When the gauge has no emission cap
+                            │   ├── It should signal the gauge received its redistribute this epoch
+                            │   ├── It should update the total emissions for the epoch
+                            │   ├── It should update the active period
+                            │   ├── It should notify the gauge without claiming fees
+                            │   └── It should emit a {Redistributed} event
+                            └── When the gauge has an emission cap
+                                ├── When the gauge received no distribute this epoch
+                                │   ├── It should signal the gauge received its redistribute this epoch
+                                │   ├── It should update the total emissions for the epoch
+                                │   ├── It should update the active period
+                                │   └── It should forward the emissions to the minter
+                                ├── When the gauge received a distribute with excess emissions this epoch
+                                │   ├── It should signal the gauge received its redistribute this epoch
+                                │   ├── It should update the total emissions for the epoch
+                                │   ├── It should update the active period
+                                │   └── It should forward the emissions to the minter
+                                └── When the gauge received a distribute this epoch
+                                    ├── When the recycled emissions exceed the max cap
+                                    │   ├── It should signal the gauge received its redistribute this epoch
+                                    │   ├── It should update the total emissions for the epoch
+                                    │   ├── It should update the active period
+                                    │   ├── It should forward the excess emissions to the minter
+                                    │   ├── It should notify the gauge without claiming fees up to its max cap
+                                    │   └── It should emit a {Redistributed} event
+                                    └── When the recycled emissions do not exceed the max cap
+                                        ├── When redistribute is called for the first time in the epoch
+                                        │   ├── When deposit has been called in the epoch
+                                        │   │   ├── It should signal the gauge received its redistribute this epoch
+                                        │   │   ├── It should update the total emissions for the epoch
+                                        │   │   ├── It should update the active period
+                                        │   │   ├── It should notify the gauge without claiming fees
+                                        │   │   └── It should emit a {Redistributed} event
+                                        │   └── When deposit has not been called in the epoch
+                                        │       ├── It should signal the gauge received its redistribute this epoch
+                                        │       ├── It should update the total emissions for the epoch
+                                        │       ├── It should update the active period
+                                        │       ├── It should update the total weight for the epoch
+                                        │       ├── It should notify the gauge without claiming fees
+                                        │       └── It should emit a {Redistributed} event
+                                        └── When redistribute is not called for the first time in the epoch
+                                            ├── When deposit has been called in the epoch_
+                                            │   ├── It should signal the gauge received its redistribute this epoch
+                                            │   ├── It should notify the gauge without claiming fees
+                                            │   └── It should emit a {Redistributed} event
+                                            └── When deposit has not been called in the epoch_
+                                                ├── It should signal the gauge received its redistribute this epoch
+                                                ├── It should update the total weight for the epoch
+                                                ├── It should notify the gauge without claiming fees
+                                                └── It should emit a {Redistributed} event
