@@ -2,6 +2,7 @@ pragma solidity ^0.7.6;
 pragma abicoder v2;
 
 import "forge-std/Test.sol";
+import {stdStorage, StdStorage} from "forge-std/Test.sol";
 
 import {TestERC20CustomDecimals} from "./mocks/TestERC20CustomDecimals.sol";
 

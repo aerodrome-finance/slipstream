@@ -86,5 +86,7 @@ abstract contract BaseForkFixture is BaseFixture {
 
         vm.prank(users.owner);
         gaugeFactory.setRedistributor({_redistributor: address(redistributor)});
+
+        MockUpkeepManager(address(upkeepManager)).setUpkeep({_upkeep: users.alice, _state: true});
     }
 }
