@@ -14,6 +14,7 @@ interface IRedistributor {
     event SetArtProxy(address indexed proxy);
     event ToggleSplit(address indexed account, bool indexed enabled);
     event PermissionsTransferred(address indexed redistributor, address indexed newRedistributor);
+    event SetUpkeepManager(address indexed upkeepManager);
 
     /**
      * @notice Deposits excess emissions into the redistributor
@@ -46,6 +47,13 @@ interface IRedistributor {
      * @dev Only callable by the owner
      */
     function notifyRewardWithoutClaim(address _gauge, uint256 _amount) external;
+
+    /**
+     * @notice Sets the UpkeepManager contract to manage keepers
+     * @param _upkeepManager The address to be set as UpkeepManager
+     * @dev Only callable by the owner
+     */
+    function setUpkeepManager(address _upkeepManager) external;
 
     /**
      * @notice Sets a new ArtProxy in the VotingEscrow

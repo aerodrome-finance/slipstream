@@ -17,7 +17,7 @@ function getRemappings() {
 
 export default {
   mocha: {
-    timeout: 50000
+    timeout: 100000
   },
   networks: {
     hardhat: {

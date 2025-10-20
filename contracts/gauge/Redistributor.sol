@@ -149,6 +149,14 @@ contract Redistributor is IRedistributor, Ownable, ReentrancyGuard {
     }
 
     /// @inheritdoc IRedistributor
+    function setUpkeepManager(address _upkeepManager) external override onlyOwner nonReentrant {
+        require(_upkeepManager != address(0), "ZA");
+        upkeepManager = _upkeepManager;
+
+        emit SetUpkeepManager({upkeepManager: _upkeepManager});
+    }
+
+    /// @inheritdoc IRedistributor
     function setArtProxy(address _proxy) external override onlyOwner nonReentrant {
         IVotingEscrow(escrow).setArtProxy({_proxy: _proxy});
 

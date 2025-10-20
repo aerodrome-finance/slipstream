@@ -59,4 +59,5 @@ abstract contract Events {
     event SetArtProxy(address indexed proxy);
     event ToggleSplit(address indexed account, bool indexed enabled);
     event PermissionsTransferred(address indexed redistributor, address indexed newRedistributor);
+    event SetUpkeepManager(address indexed upkeepManager);
 }
