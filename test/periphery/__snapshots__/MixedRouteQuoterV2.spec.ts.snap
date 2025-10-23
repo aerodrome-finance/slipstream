@@ -1,51 +1,105 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`MixedRouteQuoterV2 quotes #quoteExactInput V3 only 0 -> 2 -> 1 1`] = `369817`;
+exports[`MixedRouteQuoterV2 quotes #quoteExactInput V3 canonical factory only 0 -> 2 -> 1 1`] = `370005`;
 
-exports[`MixedRouteQuoterV2 quotes #quoteExactInput V3 only 0 -> 2 cross 0 tick, starting tick initialized 1`] = `169732`;
+exports[`MixedRouteQuoterV2 quotes #quoteExactInput V3 canonical factory only 0 -> 2 -> 1 mixed canonical + legacy 1`] = `369988`;
 
-exports[`MixedRouteQuoterV2 quotes #quoteExactInput V3 only 0 -> 2 cross 0 tick, starting tick not initialized 1`] = `138366`;
+exports[`MixedRouteQuoterV2 quotes #quoteExactInput V3 canonical factory only 0 -> 2 cross 0 tick, starting tick initialized 1`] = `169826`;
 
-exports[`MixedRouteQuoterV2 quotes #quoteExactInput V3 only 0 -> 2 cross 1 tick 1`] = `198948`;
+exports[`MixedRouteQuoterV2 quotes #quoteExactInput V3 canonical factory only 0 -> 2 cross 0 tick, starting tick not initialized 1`] = `138460`;
 
-exports[`MixedRouteQuoterV2 quotes #quoteExactInput V3 only 0 -> 2 cross 2 tick 1`] = `245418`;
+exports[`MixedRouteQuoterV2 quotes #quoteExactInput V3 canonical factory only 0 -> 2 cross 1 tick 1`] = `199042`;
 
-exports[`MixedRouteQuoterV2 quotes #quoteExactInput V3 only 0 -> 2 cross 2 tick where after is initialized 1`] = `198986`;
+exports[`MixedRouteQuoterV2 quotes #quoteExactInput V3 canonical factory only 0 -> 2 cross 2 tick 1`] = `245512`;
 
-exports[`MixedRouteQuoterV2 quotes #quoteExactInput V3 only 2 -> 0 cross 0 tick, starting tick initialized 1`] = `127228`;
+exports[`MixedRouteQuoterV2 quotes #quoteExactInput V3 canonical factory only 0 -> 2 cross 2 tick where after is initialized 1`] = `199080`;
 
-exports[`MixedRouteQuoterV2 quotes #quoteExactInput V3 only 2 -> 0 cross 0 tick, starting tick not initialized 1`] = `127228`;
+exports[`MixedRouteQuoterV2 quotes #quoteExactInput V3 canonical factory only 2 -> 0 cross 0 tick, starting tick initialized 1`] = `127322`;
 
-exports[`MixedRouteQuoterV2 quotes #quoteExactInput V3 only 2 -> 0 cross 2 1`] = `234098`;
+exports[`MixedRouteQuoterV2 quotes #quoteExactInput V3 canonical factory only 2 -> 0 cross 0 tick, starting tick not initialized 1`] = `127322`;
 
-exports[`MixedRouteQuoterV2 quotes #quoteExactInput V3 only 2 -> 0 cross 2 where tick after is initialized 1`] = `234106`;
+exports[`MixedRouteQuoterV2 quotes #quoteExactInput V3 canonical factory only 2 -> 0 cross 2 1`] = `234192`;
 
-exports[`MixedRouteQuoterV2 quotes #quoteExactInput V3 only 2 -> 1 1`] = `126903`;
+exports[`MixedRouteQuoterV2 quotes #quoteExactInput V3 canonical factory only 2 -> 0 cross 2 where tick after is initialized 1`] = `234200`;
 
-exports[`MixedRouteQuoterV2 quotes #quoteExactInputSingle V3 0 -> 2 1`] = `245400`;
+exports[`MixedRouteQuoterV2 quotes #quoteExactInput V3 canonical factory only 2 -> 1 1`] = `126997`;
 
-exports[`MixedRouteQuoterV2 quotes #quoteExactInputSingle V3 2 -> 0 1`] = `234070`;
+exports[`MixedRouteQuoterV2 quotes #quoteExactInput V3 only 0 -> 2 -> 1 1`] = `369971`;
 
-exports[`MixedRouteQuoterV2 quotes #quoteExactOutput 0 -> 2 -> 1 1`] = `373417`;
+exports[`MixedRouteQuoterV2 quotes #quoteExactInput V3 only 0 -> 2 cross 0 tick, starting tick initialized 1`] = `169809`;
 
-exports[`MixedRouteQuoterV2 quotes #quoteExactOutput 0 -> 2 cross 0 tick starting tick initialized 1`] = `171242`;
+exports[`MixedRouteQuoterV2 quotes #quoteExactInput V3 only 0 -> 2 cross 0 tick, starting tick not initialized 1`] = `138443`;
 
-exports[`MixedRouteQuoterV2 quotes #quoteExactOutput 0 -> 2 cross 0 tick starting tick not initialized 1`] = `139896`;
+exports[`MixedRouteQuoterV2 quotes #quoteExactInput V3 only 0 -> 2 cross 1 tick 1`] = `199025`;
 
-exports[`MixedRouteQuoterV2 quotes #quoteExactOutput 0 -> 2 cross 1 tick 1`] = `200189`;
+exports[`MixedRouteQuoterV2 quotes #quoteExactInput V3 only 0 -> 2 cross 2 tick 1`] = `245495`;
 
-exports[`MixedRouteQuoterV2 quotes #quoteExactOutput 0 -> 2 cross 2 tick 1`] = `246415`;
+exports[`MixedRouteQuoterV2 quotes #quoteExactInput V3 only 0 -> 2 cross 2 tick where after is initialized 1`] = `199063`;
 
-exports[`MixedRouteQuoterV2 quotes #quoteExactOutput 0 -> 2 cross 2 where tick after is initialized 1`] = `200227`;
+exports[`MixedRouteQuoterV2 quotes #quoteExactInput V3 only 2 -> 0 cross 0 tick, starting tick initialized 1`] = `127305`;
 
-exports[`MixedRouteQuoterV2 quotes #quoteExactOutput 2 -> 0 cross 1 tick 1`] = `190081`;
+exports[`MixedRouteQuoterV2 quotes #quoteExactInput V3 only 2 -> 0 cross 0 tick, starting tick not initialized 1`] = `127305`;
 
-exports[`MixedRouteQuoterV2 quotes #quoteExactOutput 2 -> 0 cross 2 ticks 1`] = `236213`;
+exports[`MixedRouteQuoterV2 quotes #quoteExactInput V3 only 2 -> 0 cross 2 1`] = `234175`;
 
-exports[`MixedRouteQuoterV2 quotes #quoteExactOutput 2 -> 0 cross 2 where tick after is initialized 1`] = `236207`;
+exports[`MixedRouteQuoterV2 quotes #quoteExactInput V3 only 2 -> 0 cross 2 where tick after is initialized 1`] = `234183`;
 
-exports[`MixedRouteQuoterV2 quotes #quoteExactOutput 2 -> 1 1`] = `129489`;
+exports[`MixedRouteQuoterV2 quotes #quoteExactInput V3 only 2 -> 1 1`] = `126980`;
 
-exports[`MixedRouteQuoterV2 quotes #quoteExactOutputSingle 0 -> 1 1`] = `140677`;
+exports[`MixedRouteQuoterV2 quotes #quoteExactInputSingle V3 0 -> 2 1`] = `245477`;
 
-exports[`MixedRouteQuoterV2 quotes #quoteExactOutputSingle 1 -> 0 1`] = `130094`;
+exports[`MixedRouteQuoterV2 quotes #quoteExactInputSingle V3 2 -> 0 1`] = `234147`;
+
+exports[`MixedRouteQuoterV2 quotes #quoteExactInputSingle V3 canonical factory 0 -> 2 1`] = `245494`;
+
+exports[`MixedRouteQuoterV2 quotes #quoteExactInputSingle V3 canonical factory 2 -> 0 1`] = `234164`;
+
+exports[`MixedRouteQuoterV2 quotes #quoteExactOutput 0 -> 2 -> 1 1`] = `373571`;
+
+exports[`MixedRouteQuoterV2 quotes #quoteExactOutput 0 -> 2 cross 0 tick starting tick initialized 1`] = `171319`;
+
+exports[`MixedRouteQuoterV2 quotes #quoteExactOutput 0 -> 2 cross 0 tick starting tick not initialized 1`] = `139973`;
+
+exports[`MixedRouteQuoterV2 quotes #quoteExactOutput 0 -> 2 cross 1 tick 1`] = `200266`;
+
+exports[`MixedRouteQuoterV2 quotes #quoteExactOutput 0 -> 2 cross 2 tick 1`] = `246492`;
+
+exports[`MixedRouteQuoterV2 quotes #quoteExactOutput 0 -> 2 cross 2 where tick after is initialized 1`] = `200304`;
+
+exports[`MixedRouteQuoterV2 quotes #quoteExactOutput 2 -> 0 cross 1 tick 1`] = `190158`;
+
+exports[`MixedRouteQuoterV2 quotes #quoteExactOutput 2 -> 0 cross 2 ticks 1`] = `236290`;
+
+exports[`MixedRouteQuoterV2 quotes #quoteExactOutput 2 -> 0 cross 2 where tick after is initialized 1`] = `236284`;
+
+exports[`MixedRouteQuoterV2 quotes #quoteExactOutput 2 -> 1 1`] = `129566`;
+
+exports[`MixedRouteQuoterV2 quotes #quoteExactOutput canonical factory 0 -> 2 -> 1 1`] = `373605`;
+
+exports[`MixedRouteQuoterV2 quotes #quoteExactOutput canonical factory 0 -> 2 -> 1 mixed canonical + legacy 1`] = `373588`;
+
+exports[`MixedRouteQuoterV2 quotes #quoteExactOutput canonical factory 0 -> 2 cross 0 tick starting tick initialized 1`] = `171336`;
+
+exports[`MixedRouteQuoterV2 quotes #quoteExactOutput canonical factory 0 -> 2 cross 0 tick starting tick not initialized 1`] = `139990`;
+
+exports[`MixedRouteQuoterV2 quotes #quoteExactOutput canonical factory 0 -> 2 cross 1 tick 1`] = `200283`;
+
+exports[`MixedRouteQuoterV2 quotes #quoteExactOutput canonical factory 0 -> 2 cross 2 tick 1`] = `246509`;
+
+exports[`MixedRouteQuoterV2 quotes #quoteExactOutput canonical factory 0 -> 2 cross 2 where tick after is initialized 1`] = `200321`;
+
+exports[`MixedRouteQuoterV2 quotes #quoteExactOutput canonical factory 2 -> 0 cross 1 tick 1`] = `190175`;
+
+exports[`MixedRouteQuoterV2 quotes #quoteExactOutput canonical factory 2 -> 0 cross 2 ticks 1`] = `236307`;
+
+exports[`MixedRouteQuoterV2 quotes #quoteExactOutput canonical factory 2 -> 0 cross 2 where tick after is initialized 1`] = `236301`;
+
+exports[`MixedRouteQuoterV2 quotes #quoteExactOutput canonical factory 2 -> 1 1`] = `129583`;
+
+exports[`MixedRouteQuoterV2 quotes #quoteExactOutputSingle 0 -> 1 1`] = `140754`;
+
+exports[`MixedRouteQuoterV2 quotes #quoteExactOutputSingle 1 -> 0 1`] = `130171`;
+
+exports[`MixedRouteQuoterV2 quotes #quoteExactOutputSingle canonical factory 0 -> 1 1`] = `140771`;
+
+exports[`MixedRouteQuoterV2 quotes #quoteExactOutputSingle canonical factory 1 -> 0 1`] = `130188`;

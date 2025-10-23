@@ -140,7 +140,12 @@ contract DeployCL is Script {
         mixedQuoter = new MixedRouteQuoterV1({_factory: address(poolFactory), _factoryV2: factoryV2, _WETH9: weth});
         quoter = new QuoterV2({_factory: address(poolFactory), _WETH9: weth});
         swapRouter = new SwapRouter({_factory: address(poolFactory), _WETH9: weth});
-        mixedQuoterV2 = new MixedRouteQuoterV2({_factory: address(poolFactory), _factoryV2: factoryV2, _WETH9: weth});
+        mixedQuoterV2 = new MixedRouteQuoterV2({
+            _factory: address(poolFactory),
+            _legacyCLFactory: legacyCLFactory,
+            _factoryV2: factoryV2,
+            _WETH9: weth
+        });
         vm.stopBroadcast();
 
         // write to file

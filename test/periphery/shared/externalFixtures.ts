@@ -30,7 +30,10 @@ const wethFixture: Fixture<{ weth9: IWETH9 }> = async ([wallet]) => {
 
 const v3CoreFactoryFixture: Fixture<{
   factory: ICLFactory
+  legacyFactory: ICLFactory
+  gaugeFactory: CLGaugeFactory
   nft: MockTimeNonfungiblePositionManager
+  legacyNFT: MockTimeNonfungiblePositionManager
   weth9: IWETH9
   tokens: [TestERC20, TestERC20, TestERC20]
   nftDescriptor: NonfungibleTokenPositionDescriptor
@@ -77,7 +80,12 @@ const v3CoreFactoryFixture: Fixture<{
     mockMinter.address
   )) as MockVoter
 
-  const factory = (await Factory.deploy(mockVoter.address, mockLegacyCLFactory.address, pool.address)) as ICLFactory
+  const legacyFactory = (await Factory.deploy(
+    mockVoter.address,
+    mockLegacyCLFactory.address,
+    pool.address
+  )) as ICLFactory
+  const factory = (await Factory.deploy(mockVoter.address, legacyFactory.address, pool.address)) as ICLFactory
   const customUnstakedFeeModule = (await CustomUnstakedFeeModuleFactory.deploy(
     factory.address
   )) as CustomUnstakedFeeModule
@@ -109,6 +117,12 @@ const v3CoreFactoryFixture: Fixture<{
     '0x4554480000000000000000000000000000000000000000000000000000000000'
   )) as NonfungibleTokenPositionDescriptor
 
+  const legacyNFT = (await positionManagerFactory.deploy(
+    legacyFactory.address,
+    weth9.address,
+    nftDescriptor.address
+  )) as MockTimeNonfungiblePositionManager
+
   const nft = (await positionManagerFactory.deploy(
     factory.address,
     weth9.address,
@@ -128,23 +142,30 @@ const v3CoreFactoryFixture: Fixture<{
   // backwards compatible with v3-periphery tests
   await factory['enableTickSpacing(int24,uint24)'](10, 500)
   await factory['enableTickSpacing(int24,uint24)'](60, 3_000)
-  return { factory, gaugeFactory, nft, weth9, tokens, nftDescriptor }
+  await legacyFactory['enableTickSpacing(int24,uint24)'](10, 500)
+  await legacyFactory['enableTickSpacing(int24,uint24)'](60, 3_000)
+  return { factory, legacyFactory, gaugeFactory, nft, legacyNFT, weth9, tokens, nftDescriptor }
 }
 
 export const v3RouterFixture: Fixture<{
   weth9: IWETH9
   factory: ICLFactory
+  legacyFactory: ICLFactory
   router: MockTimeSwapRouter
   nft: MockTimeNonfungiblePositionManager
+  legacyNFT: MockTimeNonfungiblePositionManager
   tokens: [TestERC20, TestERC20, TestERC20]
   nftDescriptor: NonfungibleTokenPositionDescriptor
 }> = async ([wallet], provider) => {
-  const { factory, nft, weth9, tokens, nftDescriptor } = await v3CoreFactoryFixture([wallet], provider)
+  const { factory, legacyFactory, nft, legacyNFT, weth9, tokens, nftDescriptor } = await v3CoreFactoryFixture(
+    [wallet],
+    provider
+  )
 
   const router = (await (await ethers.getContractFactory('MockTimeSwapRouter')).deploy(
     factory.address,
     weth9.address
   )) as MockTimeSwapRouter
 
-  return { factory, weth9, router, nft, tokens, nftDescriptor }
+  return { factory, legacyFactory, weth9, router, nft, legacyNFT, tokens, nftDescriptor }
 }

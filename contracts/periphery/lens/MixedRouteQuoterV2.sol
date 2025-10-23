@@ -27,23 +27,32 @@ contract MixedRouteQuoterV2 is IMixedRouteQuoterV2, ICLSwapCallback, PeripheryIm
     using SafeCast for uint256;
     using PoolTicksCounter for ICLPool;
 
+    address public immutable legacyCLFactory;
     address public immutable factoryV2;
+
     /// @dev Value to bit mask with path fee to determine if V2 or V3 route
-    // max V3 tick spacing:     000000000100000000000000 (24 bits)
-    // volatile mask: 1 << 22 = 010000000000000000000000 = decimal value 4194304
-    // stable mask    1 << 21 = 001000000000000000000000 = decimal value 2097152
+    // max V3 tick spacing:           000000000100000000000000 (24 bits)
+    // volatile mask:       1 << 22 = 010000000000000000000000 = decimal value 4194304
+    // stable mask:         1 << 21 = 001000000000000000000000 = decimal value 2097152
+    // cl factory mask:     1 << 20 = 000100000000000000000000 = decimal value 1048576
     int24 private constant volatileBitmask = 4194304;
     int24 private constant stableBitmask = 2097152;
+    int24 private constant clBitmask = 1048576;
 
     /// @dev Transient storage variable used to check a safety condition in exact output swaps.
     uint256 private amountOutCached;
 
-    constructor(address _factory, address _factoryV2, address _WETH9) PeripheryImmutableState(_factory, _WETH9) {
+    constructor(address _factory, address _legacyCLFactory, address _factoryV2, address _WETH9)
+        PeripheryImmutableState(_factory, _WETH9)
+    {
+        legacyCLFactory = _legacyCLFactory;
         factoryV2 = _factoryV2;
     }
 
     function getPool(address tokenA, address tokenB, int24 tickSpacing) private view returns (ICLPool) {
-        return ICLPool(ICLFactory(factory).getPool(tokenA, tokenB, tickSpacing));
+        return tickSpacing & clBitmask != 0
+            ? ICLPool(ICLFactory(factory).getPool(tokenA, tokenB, tickSpacing & ~clBitmask))
+            : ICLPool(ICLFactory(legacyCLFactory).getPool(tokenA, tokenB, tickSpacing));
     }
 
     /// @dev Given an amountIn, get the amountOut for the corresponding pool
@@ -66,7 +75,11 @@ contract MixedRouteQuoterV2 is IMixedRouteQuoterV2, ICLSwapCallback, PeripheryIm
     {
         require(amount0Delta > 0 || amount1Delta > 0); // swaps entirely within 0-liquidity regions are not supported
         (address tokenIn, address tokenOut, int24 tickSpacing) = path.decodeFirstPool();
-        CallbackValidation.verifyCallback(factory, tokenIn, tokenOut, tickSpacing);
+        if (tickSpacing & clBitmask != 0) {
+            CallbackValidation.verifyCallback(factory, tokenIn, tokenOut, tickSpacing & ~clBitmask);
+        } else {
+            CallbackValidation.verifyCallback(legacyCLFactory, tokenIn, tokenOut, tickSpacing);
+        }
 
         (bool isExactInput, uint256 amountToPay, uint256 amountReceived) = amount0Delta > 0
             ? (tokenIn < tokenOut, uint256(amount0Delta), uint256(-amount1Delta))
