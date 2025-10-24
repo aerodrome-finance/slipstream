@@ -282,17 +282,17 @@ contract CLGauge is ICLGauge, ERC721Holder, ReentrancyGuard {
 
         _claimFees();
 
+        TransferHelper.safeTransferFrom(rewardToken, sender, address(this), _amount);
         uint256 maxAmount = gaugeFactory.calculateMaxEmissions({_gauge: address(this)});
         /// @dev If emission cap is exceeded, transfer excess emissions back to Redistributor
         if (_amount > maxAmount) {
             uint256 excess = _amount - maxAmount;
             address redistributor = gaugeFactory.redistributor();
-            TransferHelper.safeTransferFrom(rewardToken, sender, address(this), excess);
             TransferHelper.safeApprove(rewardToken, redistributor, excess);
             IRedistributor(redistributor).deposit({_amount: excess});
             _amount = maxAmount;
         }
-        _notifyRewardAmount(sender, _amount);
+        _notifyRewardAmount({_sender: sender, _amount: _amount});
     }
 
     /// @inheritdoc ICLGauge
@@ -300,7 +300,8 @@ contract CLGauge is ICLGauge, ERC721Holder, ReentrancyGuard {
         address sender = msg.sender;
         require(sender == gaugeFactory.notifyAdmin() || sender == gaugeFactory.redistributor(), "NA");
         require(_amount != 0, "ZR");
-        _notifyRewardAmount(sender, _amount);
+        TransferHelper.safeTransferFrom(rewardToken, sender, address(this), _amount);
+        _notifyRewardAmount({_sender: sender, _amount: _amount});
     }
 
     function _notifyRewardAmount(address _sender, uint256 _amount) internal {
@@ -309,7 +310,6 @@ contract CLGauge is ICLGauge, ERC721Holder, ReentrancyGuard {
         pool.updateRewardsGrowthGlobal();
         uint256 nextPeriodFinish = timestamp + timeUntilNext;
 
-        TransferHelper.safeTransferFrom(rewardToken, _sender, address(this), _amount);
         // rolling over stuck rewards from previous epoch (if any)
         _amount += pool.rollover();
 
