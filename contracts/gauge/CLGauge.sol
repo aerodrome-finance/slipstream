@@ -306,9 +306,9 @@ contract CLGauge is ICLGauge, ERC721Holder, ReentrancyGuard {
 
     function _notifyRewardAmount(address _sender, uint256 _amount) internal {
         uint256 timestamp = block.timestamp;
-        uint256 timeUntilNext = ProtocolTimeLibrary.epochNext(timestamp) - timestamp;
+        uint256 nextPeriodFinish = ProtocolTimeLibrary.epochNext(timestamp);
+        uint256 timeUntilNext = nextPeriodFinish - timestamp;
         pool.updateRewardsGrowthGlobal();
-        uint256 nextPeriodFinish = timestamp + timeUntilNext;
 
         // rolling over stuck rewards from previous epoch (if any)
         _amount += pool.rollover();
