@@ -62,8 +62,6 @@ contract CLGauge is ICLGauge, ERC721Holder, ReentrancyGuard {
     /// @inheritdoc ICLGauge
     uint256 public override fees1;
     /// @inheritdoc ICLGauge
-    address public override WETH9;
-    /// @inheritdoc ICLGauge
     address public override token0;
     /// @inheritdoc ICLGauge
     address public override token1;
@@ -72,8 +70,6 @@ contract CLGauge is ICLGauge, ERC721Holder, ReentrancyGuard {
 
     /// @inheritdoc ICLGauge
     bool public override isPool;
-    /// @inheritdoc ICLGauge
-    bool public override supportsPayable;
 
     /// @inheritdoc ICLGauge
     function initialize(
@@ -94,17 +90,10 @@ contract CLGauge is ICLGauge, ERC721Holder, ReentrancyGuard {
         rewardToken = _rewardToken;
         voter = IVoter(_voter);
         nft = INonfungiblePositionManager(_nft);
-        address _weth = nft.WETH9();
-        WETH9 = _weth;
         token0 = _token0;
         token1 = _token1;
         tickSpacing = _tickSpacing;
         isPool = _isPool;
-        supportsPayable = _token0 == _weth || _token1 == _weth;
-    }
-
-    receive() external payable {
-        require(msg.sender == address(nft), "NNFT");
     }
 
     // updates the claimable rewards and lastUpdateTime for tokenId

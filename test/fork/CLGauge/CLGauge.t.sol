@@ -18,7 +18,6 @@ abstract contract CLGaugeForkTest is BaseForkFixture {
         assertEq(gauge.rewardRateByEpoch(block.timestamp), 0);
         assertEq(gauge.fees0(), 0);
         assertEq(gauge.fees1(), 0);
-        assertEq(gauge.WETH9(), address(weth));
         assertEq(gauge.token0(), address(token0));
         assertEq(gauge.token1(), address(token1));
         assertEq(gauge.tickSpacing(), pool.tickSpacing());
@@ -26,7 +25,6 @@ abstract contract CLGaugeForkTest is BaseForkFixture {
         assertEq(gauge.left(), 0);
         assertEq(gauge.rewardToken(), address(rewardToken));
         assertTrue(gauge.isPool());
-        assertFalse(gauge.supportsPayable());
         assertEq(gauge.rewardsByEpoch(block.timestamp), 0);
     }
 }

@@ -43,7 +43,6 @@ contract CreateGaugeTest is CLGaugeFactoryTest {
         assertEq(gauge.feesVotingReward(), address(feesVotingReward));
         assertEq(gauge.rewardToken(), address(rewardToken));
         assertEq(address(gauge.gaugeFactory()), address(gaugeFactory));
-        assertFalse(gauge.supportsPayable());
         assertEq(gauge.isPool(), true);
         assertTrue(gaugeFactory.isGauge(address(gauge)));
     }
@@ -62,7 +61,6 @@ contract CreateGaugeTest is CLGaugeFactoryTest {
         assertEq(gauge.feesVotingReward(), address(feesVotingReward));
         assertEq(gauge.rewardToken(), address(rewardToken));
         assertEq(address(gauge.gaugeFactory()), address(gaugeFactory));
-        assertTrue(gauge.supportsPayable());
         assertEq(gauge.isPool(), true);
         assertTrue(gaugeFactory.isGauge(address(gauge)));
     }
