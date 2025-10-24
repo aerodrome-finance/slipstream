@@ -64,7 +64,7 @@ contract CLGaugeFactory is ICLGaugeFactory {
         legacyCLGaugeFactory = ICLGaugeFactory(_legacyCLGaugeFactory);
         rewardToken = address(IMinter(_minter).aero());
         emissionAdmin = _emissionAdmin;
-        defaultCap = _defaultCap;
+        _setDefaultCap({_defaultCap: _defaultCap});
     }
 
     /// @inheritdoc ICLGaugeFactory
@@ -116,10 +116,7 @@ contract CLGaugeFactory is ICLGaugeFactory {
     /// @inheritdoc ICLGaugeFactory
     function setDefaultCap(uint256 _defaultCap) external override {
         require(msg.sender == emissionAdmin, "NA");
-        require(_defaultCap != 0, "ZDC");
-        require(_defaultCap <= MAX_BPS, "MC");
-        defaultCap = _defaultCap;
-        emit SetDefaultCap({_newDefaultCap: _defaultCap});
+        _setDefaultCap({_defaultCap: _defaultCap});
     }
 
     /// @inheritdoc ICLGaugeFactory
@@ -180,5 +177,12 @@ contract CLGaugeFactory is ICLGaugeFactory {
         } else {
             return (weeklyEmissions * maxRate) / MAX_BPS;
         }
+    }
+
+    function _setDefaultCap(uint256 _defaultCap) internal {
+        require(_defaultCap != 0, "ZDC");
+        require(_defaultCap <= MAX_BPS, "MC");
+        defaultCap = _defaultCap;
+        emit SetDefaultCap({_newDefaultCap: _defaultCap});
     }
 }
