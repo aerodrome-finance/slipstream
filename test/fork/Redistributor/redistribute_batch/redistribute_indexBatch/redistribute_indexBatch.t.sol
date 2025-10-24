@@ -95,6 +95,26 @@ contract RedistributeIndexBatchIntegrationConcreteTest is RedistributorForkTest 
         _;
     }
 
+    function test_WhenTheEndIsSmallerOrEqualToStart() external whenTheCallerIsAGaugeUpkeepOrTheKeeper {
+        // It should revert with {Underflow}
+        vm.expectRevert(bytes("UF"));
+        redistributor.redistribute({_start: startIndex, _end: startIndex});
+
+        vm.expectRevert(bytes("UF"));
+        redistributor.redistribute({_start: startIndex, _end: startIndex - 1});
+
+        vm.startPrank(users.bob);
+        vm.expectRevert(bytes("UF"));
+        redistributor.redistribute({_start: startIndex, _end: startIndex});
+
+        vm.expectRevert(bytes("UF"));
+        redistributor.redistribute({_start: startIndex, _end: startIndex - 1});
+    }
+
+    modifier whenTheEndIsGreaterThanStart() {
+        _;
+    }
+
     function test_WhenCalledDuringTheFirst10MinutesOfTheEpoch() external whenTheCallerIsAGaugeUpkeepOrTheKeeper {
         // It should revert with {TooSoon}
         assertLt(block.timestamp, epochStart + 10 minutes);

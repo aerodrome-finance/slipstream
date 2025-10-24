@@ -10,6 +10,4 @@ exports[`TickLens #getPopulatedTicksInWord gas costs by tick 4 fully populated w
 
 exports[`TickLens #getPopulatedTicksInWord gas costs by tick 5 fully populated words 1`] = `22334442`;
 
-exports[`TickLens #getPopulatedTicksInWord gas costs by tick 6 fully populated words 1`] = `27079707`;
-
 exports[`TickLens #getPopulatedTicksInWord gas for single populated tick 1`] = `66498`;

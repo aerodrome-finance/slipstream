@@ -114,6 +114,7 @@ contract Redistributor is IRedistributor, Ownable, ReentrancyGuard {
 
     /// @inheritdoc IRedistributor
     function redistribute(uint256 _start, uint256 _end) external override onlyUpkeepOrKeeper nonReentrant {
+        require(_end > _start, "UF");
         uint256 epochStart = ProtocolTimeLibrary.epochStart({timestamp: block.timestamp});
         require(block.timestamp >= epochStart + 10 minutes, "TS");
 

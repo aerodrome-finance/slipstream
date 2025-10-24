@@ -2,23 +2,26 @@ RedistributeIndexBatchIntegrationConcreteTest
 ├── When the caller is not a gauge upkeep or the keeper
 │   └── It should revert with {NotAuthorized}
 └── When the caller is a gauge upkeep or the keeper
-    ├── When called during the first 10 minutes of the epoch
-    │   └── It should revert with {TooSoon}
-    └── When called after the first 10 minutes of the epoch
-        ├── When there are no emissions to redistribute
-        │   ├── It should update the active period
-        │   └── It should skip the redistribution
-        └── When there are emissions to redistribute
-            ├── When all gauges are skipped
-            │   ├── It should update the total emissions for the epoch
+    ├── When the end is smaller or equal to start
+    │   └── It should revert with {Underflow}
+    └── When the end is greater than start
+        ├── When called during the first 10 minutes of the epoch
+        │   └── It should revert with {TooSoon}
+        └── When called after the first 10 minutes of the epoch
+            ├── When there are no emissions to redistribute
             │   ├── It should update the active period
-            │   └── It should skip all gauges in the range
-            ├── When some gauges receive redistributes
-            │   ├── It should update the total emissions for the epoch
-            │   ├── It should update the active period
-            │   ├── It should skip the required gauges
-            │   └── It should redistribute to the remaining gauges in the range
-            └── When all gauges receive redistributes
-                ├── It should update the total emissions for the epoch
-                ├── It should update the active period
-                └── It should redistribute to all gauges in the range
+            │   └── It should skip the redistribution
+            └── When there are emissions to redistribute
+                ├── When all gauges are skipped
+                │   ├── It should update the total emissions for the epoch
+                │   ├── It should update the active period
+                │   └── It should skip all gauges in the range
+                ├── When some gauges receive redistributes
+                │   ├── It should update the total emissions for the epoch
+                │   ├── It should update the active period
+                │   ├── It should skip the required gauges
+                │   └── It should redistribute to the remaining gauges in the range
+                └── When all gauges receive redistributes
+                    ├── It should update the total emissions for the epoch
+                    ├── It should update the active period
+                    └── It should redistribute to all gauges in the range
