@@ -28,7 +28,7 @@ interface IRedistributor {
     /**
      * @notice Redistributes the emissions to the given gauges according to their voting weight
      * @param _gauges The array of gauge addresses to redistribute emissions to
-     * @dev Only callable by keepers registered in the UpkeepManager or the owner
+     * @dev Only callable by keepers registered in the UpkeepManager or the keeper
      */
     function redistribute(address[] memory _gauges) external;
 
@@ -36,7 +36,7 @@ interface IRedistributor {
      * @notice Redistributes the emissions to the gauges in the given index range according to their voting weight
      * @param _start The index of the first pool whose gauge emissions will be distributed to (inclusive)
      * @param _end The index of the last gauge's pool (exclusive)
-     * @dev Only callable by keepers registered in the UpkeepManager or the owner
+     * @dev Only callable by keepers registered in the UpkeepManager or the keeper
      */
     function redistribute(uint256 _start, uint256 _end) external;
 
