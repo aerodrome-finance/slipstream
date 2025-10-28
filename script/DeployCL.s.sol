@@ -163,6 +163,7 @@ contract DeployCL is Script {
         vm.writeJson(vm.serializeAddress("", "MixedQuoterV2", address(mixedQuoterV2)), path);
         vm.writeJson(vm.serializeAddress("", "Quoter", address(quoter)), path);
         vm.writeJson(vm.serializeAddress("", "SwapRouter", address(swapRouter)), path);
+        vm.writeJson(vm.serializeAddress("", "Redistributor", address(redistributor)), path);
     }
 
     function concat(string memory a, string memory b) internal pure returns (string memory) {
