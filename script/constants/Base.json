@@ -11,7 +11,7 @@
   "factoryV2": "0x420DD381b31aEf6683db6B902084cB0FFECe40Da",
   "legacyCLFactory": "0x5e7BB104d84c7CB9B682AaC2F3d509f5F406809A",
   "legacyCLGaugeFactory": "0xD30677bd8dd15132F251Cb54CbDA552d2A05Fb08",
-  "upkeepManager": "0x0000000000000000000000000000000000000000",
+  "upkeepManager": "0x4B364C2B5fe67B8566CDe8D0C5335F791030bECC",
   "nftName": "Slipstream Position NFT v1",
   "nftSymbol": "AERO-CL-POS",
   "tokenA": [
