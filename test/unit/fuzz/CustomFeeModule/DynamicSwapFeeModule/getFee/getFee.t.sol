@@ -34,6 +34,9 @@ contract GetFeeFuzzTest is DynamicSwapFeeModuleFuzzTest {
     function setUp() public override {
         super.setUp();
 
+        vm.prank(poolFactory.swapFeeManager());
+        dynamicSwapFeeModule.setSecondsAgo({_secondsAgo: 3600});
+
         validTickSpacing[TICK_SPACING_STABLE] = true;
         validTickSpacing[TICK_SPACING_LOW] = true;
         validTickSpacing[TICK_SPACING_MEDIUM] = true;

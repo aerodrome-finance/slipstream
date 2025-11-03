@@ -23,8 +23,10 @@ contract GetFeeForkTest is DynamicSwapFeeModuleForkTest {
 
         originalSwapFee = poolFactory.getSwapFee(pool);
 
-        vm.prank(poolFactory.swapFeeManager());
+        vm.startPrank(poolFactory.swapFeeManager());
         poolFactory.setSwapFeeModule({_swapFeeModule: address(dynamicSwapFeeModule)});
+        dynamicSwapFeeModule.setSecondsAgo({_secondsAgo: 3600});
+        vm.stopPrank();
 
         newBaseSwapFee = originalSwapFee / 2;
         // set back the original swap fee / 2 as base fee

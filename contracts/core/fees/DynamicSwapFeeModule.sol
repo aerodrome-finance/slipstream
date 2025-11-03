@@ -30,7 +30,7 @@ contract DynamicSwapFeeModule is IDynamicFeeModule {
     /// @inheritdoc IDynamicFeeModule
     uint256 public override defaultFeeCap;
     /// @inheritdoc IDynamicFeeModule
-    uint32 public override secondsAgo = 3600; // 1 hour
+    uint32 public override secondsAgo = 600; // 10 minutes
 
     /// @inheritdoc IFeeModule
     ICLFactory public immutable override factory;

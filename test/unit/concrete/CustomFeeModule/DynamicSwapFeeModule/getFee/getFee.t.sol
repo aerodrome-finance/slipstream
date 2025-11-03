@@ -11,6 +11,9 @@ contract GetFeeTest is DynamicSwapFeeModuleTest {
     function setUp() public override {
         super.setUp();
 
+        vm.prank(poolFactory.swapFeeManager());
+        dynamicSwapFeeModule.setSecondsAgo({_secondsAgo: 3600});
+
         // skip some initial time
         skip(10000 seconds);
         // add some liq

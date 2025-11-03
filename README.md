@@ -55,3 +55,4 @@ Velodrome has a live bug bounty hosted on ([Immunefi](https://immunefi.com/bount
 | CustomUnstakedFeeModule               | [0x0AD08370c76Ff426F534bb2AFFD9b5555338ee68](https://basescan.org/address/0x0AD08370c76Ff426F534bb2AFFD9b5555338ee68#code) |
 | SwapRouter               | [0xBE6D8f0d05cC4be24d5167a3eF062215bE6D18a5](https://basescan.org/address/0xBE6D8f0d05cC4be24d5167a3eF062215bE6D18a5#code) |
 | SugarHelper               | [0x0AD09A66af0154a84e86F761313d02d0abB6edd5](https://basescan.org/address/0x0AD09A66af0154a84e86F761313d02d0abB6edd5#code) |
+| DynamicSwapFeeModule               | [0xDB45818A6db280ecfeB33cbeBd445423d0216b5D](https://basescan.org/address/0xDB45818A6db280ecfeB33cbeBd445423d0216b5D#code) |
